@@ -1,0 +1,5 @@
+yahoo-finance==1.2.1
+ddt==1.1.0
+numpy==1.11.0
+pandas==0.18.1
+pymongo==3.2.2
