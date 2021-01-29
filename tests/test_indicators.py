@@ -1,4 +1,5 @@
 import unittest
+from time import strptime
 
 import numpy as np
 import os
@@ -18,7 +19,11 @@ class TestIndicatorsHappyPath(unittest.TestCase):
 
     def assert_indicator_structure(self, indicator, result):
         self.assertIsInstance(result, DataSet)
-        self.assertEqual(result, indicator.input_data_set)
+        self.assertEqual(result, indicator.data_set)
+
+    def test_auto_calc_indicator(self):
+        sma = SMA(self.ds, period=20, field=ADJ_CLOSE)
+        self.assertEqual(sma.get_value('2016-12-28', 'MA20'), 95)
 
     def test_sma(self):
         sma = SMA(self.ds, period=20, field=ADJ_CLOSE)
@@ -29,6 +34,8 @@ class TestIndicatorsHappyPath(unittest.TestCase):
         self.assertListEqual([np.isnan(x) for x in result.data_frame['MA20'][0:19]], [True] * 19)
         #  And the next 1872 should be False
         self.assertListEqual([np.isnan(x) for x in result.data_frame['MA20'][20:]], [False] * 84)
+        self.assertEqual(sma.get_value('2016-12-28', 'MA20'), 95)
+
 
     def test_ema(self):
         ema = EMA(self.ds, period=20, field=ADJ_CLOSE)
@@ -39,6 +46,7 @@ class TestIndicatorsHappyPath(unittest.TestCase):
         self.assertListEqual([np.isnan(x) for x in result.data_frame['EMA20'][0:19]], [True] * 19)
         #  And the next 1872 should be False
         self.assertListEqual([np.isnan(x) for x in result.data_frame['EMA20'][20:]], [False] * 84)
+        self.assertEqual(ema.get_value('2016-12-28', 'EMA20'), 95)
 
 
 if __name__ == '__main__':
