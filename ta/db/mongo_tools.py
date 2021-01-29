@@ -5,6 +5,9 @@ from pymongo import MongoClient
 from conf import MONGO
 from sources import MongoTickerSource
 from ta.db import Symbol, DATE, Workflow
+import logging
+
+log = logging.getLogger("mongo-tools")
 
 ADMIN_DB = 'admin'
 SYMBOLS_COL = 'symbols'
@@ -25,7 +28,7 @@ def dataframe_to_mongo(df, symbol, overwrite=False):
         if data[DATE]:
             col.insert(data)
         else:
-            print('error, no date {}', data)
+            log.error('error, no date {}', data)
 
 def get_time_series(ticker):
     ts = MongoTickerSource(mc, ticker)

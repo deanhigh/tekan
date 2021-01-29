@@ -1,13 +1,13 @@
 import json
 import logging
-from pprint import pprint
+# from pprint import pprint
 
 from datetime import timedelta
 from pip._vendor.requests import Session
 
 import requests
 import requests_cache
-from trading_ig import IGService
+# from trading_ig import IGService
 
 
 # base_url = 'https://demo-api.ig.com/gateway/deal'
@@ -25,8 +25,8 @@ service = IGService(IDENTIFIER, 'Welcome1', API_KEY, ACCOUNT_TYPE)
 service.create_session()
 
 markets = service.fetch_historical_prices_by_epic_and_num_points('IX.D.FTSE.DAILY.IP', '1Min', 1000)
-print(markets['allowance'])
-print(markets['prices'])
+# print(markets['allowance'])
+# print(markets['prices'])
 
 # class IG(object):
 #     _base_url =

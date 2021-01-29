@@ -1,3 +1,13 @@
+import logging
+
+from ta.mdl.workflows import load_workflow_entry
+
+log = logging.getLogger("mdl")
+
+
+class Apply(object):
+    def apply(self, context):
+        raise NotImplementedError
 
 
 class DataSet(object):
@@ -5,7 +15,7 @@ class DataSet(object):
         self.id = id
 
     def load(self):
-        return NotImplemented
+        raise NotImplementedError
 
     def __str__(self):
         return id
@@ -27,7 +37,7 @@ class DataFrameDataSet(DataSet):
         return self.data_frame[series_id]
 
     def series_pointers(self):
-        return { i:SeriesPointer(self, i) for i in self.series_ids.values() }
+        return {i: SeriesPointer(self, i) for i in self.series_ids.values()}
 
     def __get_data_frame(self):
         if self.__data_frame is None and hasattr(self, 'load'):
@@ -67,6 +77,48 @@ class IndicatorSeriesPointer(object):
     def get_data(self, wc):
         return self.indicator.calc(wc)
 
-class Predicate(object):
-    def apply(self):
-        pass
+
+class Trigger(object):
+    def __init__(self, id, predicate, action):
+        self.action = action
+        self.predicate = predicate
+        self.id = id
+
+    @classmethod
+    def from_descriptor(cls, **kwargs):
+        return cls(kwargs['id'], load_workflow_entry(kwargs['predicate'], 'ta.predicates.Expression'),
+                   kwargs.get('action'))
+
+    def apply(self, context):
+        if self.predicate.apply(context):
+            if self.action:
+                self.action.apply(context)
+            else:
+                log.warning("Triggered %s : No action declared", self.id)
+
+
+class Predicate(Apply):
+    @classmethod
+    def from_descriptor(cls, **kwargs):
+        prd = cls(kwargs['id'])
+        return prd
+
+
+class Function(Apply):
+    def __init__(self, id):
+        self.id = id
+
+    def get_data(self, wc):
+        return self.apply(wc)
+
+class Action(Apply):
+    def __init__(self, id):
+        self.id = id
+
+
+class CallbackAction(Action):
+    def __init__(self, callback):
+        self.callback = callback
+
+    def apply(self, context):
+        self.callback(context)

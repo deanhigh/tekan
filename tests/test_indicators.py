@@ -20,7 +20,6 @@ basic_test_data = [
     {'ind_name': 'SYM.DX', 'ind_cls': DX, 'test_points': {'2016-12-28': 100.0}},
     {'ind_name': 'SYM.ADX', 'ind_cls': ADX, 'test_points': {'2016-12-28': 100.0}},
     {'ind_name': 'SYM.CCI', 'ind_cls': CCI, 'test_points': {'2016-12-28': 130.5011772620249}},
-
 ]
 
 

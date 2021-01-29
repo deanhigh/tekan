@@ -1,3 +1,10 @@
+sources:
+  - id: SYM.LOADER
+    class: ta.data_management.file_ds.FileSource
+    filename: test_data_frame.csv
+    fields:
+      'Adj Close': SYM.ADJ_CLOSE
+      'Open': SYM.OPEN
 indicators:
   - id: SYM.MA20
     class: ta.indicators.ma.SMA
@@ -11,10 +18,19 @@ indicators:
     class: ta.indicators.ma.EMA
     period: 20
     input_data_id: SYM.MA20
-sources:
-  - id: SYM.LOADER
-    class: ta.data_management.file_ds.FileSource
-    filename: 'test_data_frame.csv'
-    fields:
-      'Adj Close': SYM.ADJ_CLOSE
-      'Open': SYM.OPEN
+functions:
+  - id: SYM.MA20.2016-12-28
+    class: ta.functions.TimeSeriesSelector
+    ts_input: SYM.MA20
+    date_idx: 2016-12-28
+triggers:
+  - id: SYM.MA20.GT_100
+    predicate:
+      expression: input > value
+      value: 100
+      input:
+        function: SYM.MA20.2016-12-28
+
+
+
+

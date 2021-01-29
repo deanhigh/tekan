@@ -4,24 +4,40 @@ import unittest
 import numpy as np
 
 from ta.data_management.file_ds import FileSource
-from ta.indicators import SMA
-from ta.indicators.kpi import *
+from ta.indicators import *
+from ta.mdl import Trigger, CallbackAction
 from ta.mdl.workflows import WorkflowContext, WorkflowLoader
+from ta.predicates import *
+from ta.functions import *
 
-class TestWorkflowLoader(unittest.TestCase):
+
+class TestWorkflowLoading(unittest.TestCase):
+    """ Tests the loading from yaml mechanism """
     def setUp(self):
         self.wfl = WorkflowLoader.from_yaml(os.path.join(os.path.dirname(__file__), "./simple_workflow.yml"))
 
-    def test_load_yaml(self):
+    def test_load_filesource(self):
         wfl = self.wfl
-        self.assertEqual(type(wfl.sources['SYM.LOADER']), FileSource)
+        self.assertIsInstance(wfl.sources['SYM.LOADER'], FileSource)
         self.assertEqual(wfl.sources['SYM.LOADER'].id, 'SYM.LOADER')
         self.assertEqual(wfl.sources['SYM.LOADER'].filename, 'test_data_frame.csv')
 
-        self.assertEqual(type(wfl.indicators['SYM.MA20']), SMA)
+    def test_load_indicator(self):
+        wfl = self.wfl
+        self.assertIsInstance(wfl.indicators['SYM.MA20'], SMA)
         self.assertEqual(wfl.indicators['SYM.MA20'].id, 'SYM.MA20')
         self.assertEqual(wfl.indicators['SYM.MA20'].period, 20)
         self.assertEqual(wfl.indicators['SYM.MA20'].input_data_id, 'SYM.ADJ_CLOSE')
+
+    def test_load_trigger(self):
+        wfl = self.wfl
+        trigger = wfl.triggers['SYM.MA20.GT_100']
+        self.assertIsInstance( trigger, Trigger)
+        self.assertEqual(trigger.id, 'SYM.MA20.GT_100')
+        self.assertIsInstance(trigger.predicate, Expression )
+        self.assertEqual(trigger.predicate.expression, 'input > value')
+        self.assertEqual(trigger.predicate.value, 100)
+        self.assertEqual(trigger.predicate.input, 'SYM.MA20.2016-12-28')
 
     def test_get_data_sets(self):
         self.assertSetEqual(set(self.wfl.get_data_pointers().keys()),
@@ -33,10 +49,11 @@ class TestWorkflowContext(unittest.TestCase):
         wc = WorkflowContext.load(
             WorkflowLoader.from_yaml(os.path.join(os.path.dirname(__file__), "./simple_workflow.yml")))
         self.assertSetEqual(set(wc.datasets.keys()),
-                            {'SYM.OPEN', 'SYM.ADJ_CLOSE', 'SYM.MA20', 'SYM.EMA20_OF_MA20', 'SYM.EMA20'})
+                            {'SYM.OPEN', 'SYM.ADJ_CLOSE', 'SYM.MA20', 'SYM.EMA20_OF_MA20', 'SYM.EMA20', 'SYM.MA20.2016-12-28'})
 
 
 class TestWorkflowContextIndicatorDependencies(unittest.TestCase):
+    """ Tests that dependent data sources are loaded or calculated """
     def setUp(self):
         self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
 
@@ -47,6 +64,7 @@ class TestWorkflowContextIndicatorDependencies(unittest.TestCase):
 
 
 class TestJoinedData(unittest.TestCase):
+    """ Tests calculating indicators off of other indicators """
     def setUp(self):
         self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
 
@@ -58,19 +76,30 @@ class TestJoinedData(unittest.TestCase):
         self.assertListEqual([np.isnan(x) for x in self.wc.get_data('SYM.EMA20_OF_MA20')[39:]], [False] * 65)
 
 
-class TestIndicatorsFromContextLoad(unittest.TestCase):
+class TestProcessingTrigger(unittest.TestCase):
+    """ Tests calculating indicators off of other indicators """
     def setUp(self):
         self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
 
-    def test_sma(self):
-        self.assertEqual(104, len(self.wc.get_data('SYM.MA20')))
-        self.assertEqual(2270.1749999999997, self.wc.get_data('SYM.MA20')['2016-12-28'])
-        self.assertEqual(2222.8749999999995, self.wc.get_data('SYM.MA20')['2016-12-27'])
+    def test_trigger(self):
+        def callback(context):
+            raise CallbackCalled()
+        trigger = self.wc.get_trigger('SYM.MA20.GT_100')
+        trigger.action = CallbackAction(callback)
+        self.assertRaises(CallbackCalled, trigger.apply, self.wc)
 
-    def test_ema(self):
-        self.assertEqual(104, len(self.wc.get_data('SYM.EMA20')))
-        self.assertEqual(2286.7962876973415, self.wc.get_data('SYM.EMA20')['2016-12-28'])
-        self.assertEqual(2239.4958969286408, self.wc.get_data('SYM.EMA20')['2016-12-27'])
+
+class CallbackCalled(Exception):
+    def __init__(self):
+        super(CallbackCalled, self).__init__()
+
+
+
+class TestAction(unittest.TestCase):
+    def test_callback_action(self):
+        def callback(context):
+            raise CallbackCalled()
+        self.assertRaises( CallbackCalled, CallbackAction(callback).apply, None )
 
 
 if __name__ == '__main__':
