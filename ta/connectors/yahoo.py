@@ -22,7 +22,6 @@ class YahooDataSource(DataFrameDataSet):
             else:
                 self.data_frame = data.DataReader(self.id, 'yahoo', self.range_start, self.range_end)
                 self.local_store.write(self.data_frame)
-
         else:
             self.data_frame = data.DataReader(self.id, 'yahoo', self.range_start, self.range_end)
 

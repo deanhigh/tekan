@@ -1,0 +1,40 @@
+sources:
+  - id: SYM.LOADER
+    class: ta.data_management.mongo_ds.MongoTimeSeriesSource
+    collection: SPXS
+    fields:
+      'Adj Close': SYM.ADJ_CLOSE
+      'Open': SYM.OPEN
+indicators:
+  - id: SYM.MA20
+    class: ta.indicators.ma.SMA
+    period: 20
+    input_data_id: SYM.ADJ_CLOSE
+  - id: SYM.EMA20
+    class: ta.indicators.ma.EMA
+    period: 20
+    input_data_id: SYM.ADJ_CLOSE
+  - id: SYM.EMA20_OF_MA20
+    class: ta.indicators.ma.EMA
+    period: 20
+    input_data_id: SYM.MA20
+functions:
+  - id: SYM.MA20.2016-12-28
+    class: ta.functions.TimeSeriesSelector
+    ts_input: SYM.MA20
+    date_idx: 2016-12-28
+triggers:
+  - id: SYM.MA20.GT_100
+    predicate:
+      expression: input > value
+      value: 100
+      input:
+        function: SYM.MA20.2016-12-28
+    action:
+        class: ta.mdl.LogAlert
+
+
+
+
+
+

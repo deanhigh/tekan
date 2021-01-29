@@ -1,3 +1,4 @@
+from functools import partial
 from logging import warning
 
 from pymongo import MongoClient
@@ -13,10 +14,20 @@ ADMIN_DB = 'admin'
 SYMBOLS_COL = 'symbols'
 WORKFLOW_COL = 'workflows'
 WORKFLOW_NODES_COL = 'workflow_nodes'
-TS_DB = 'ts'
+
+TS_DB = 'source_ts'
 
 
 mc = MongoClient(*MONGO)
+
+
+def get_ts_collection(database, collection_name):
+    db = mc.get_database(TS_DB)
+    col = db.get_collection(collection_name)
+    col.ensure_index(DATE, unique=True)
+    return col
+
+get_source_ts_collection = partial(get_ts_collection, TS_DB)
 
 
 def dataframe_to_mongo(df, symbol, overwrite=False):

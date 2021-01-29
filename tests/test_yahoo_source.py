@@ -7,7 +7,7 @@ from ta.connectors.yahoo import YahooDataSource
 
 
 class MockLocalStore(object):
-
+    """ Mock local store for checking data caching in local store """
     def __init__(self, id, range_start, range_end):
         self.id = id
         self.range_start = range_start
@@ -23,7 +23,6 @@ class MockLocalStore(object):
             print(self.data_frame.index.max(), self.range_end)
             return self.data_frame.index.max() >= self.range_end
 
-
     def write(self, df):
         self.data_frame = df
 
@@ -31,12 +30,14 @@ class MockLocalStore(object):
     def create(cls, id, range_start, range_end ):
         return cls(id, range_start, range_end)
 
+
 class YahooIntegrationTest(unittest.TestCase):
     def test_fetch_data(self):
         ds = YahooDataSource("AAPL")
         self.assertGreater(len(ds.data_frame),0)
 
     def test_local_store(self):
+        """ Test that the local store caches the data when loading from yahoo"""
         ds = YahooDataSource("AAPL", datetime.datetime.strptime('2017-02-06', '%Y-%m-%d'), datetime.datetime.strptime('2017-02-08', '%Y-%m-%d'), local_store_factory=MockLocalStore.create)
         self.assertEqual(len(ds.data_frame), 3)
         self.assertTrue(ds.local_store.is_complete())
