@@ -1,6 +1,7 @@
 import math
 from functools import partial, reduce
 
+import numpy as np
 from indicators.smoothing import Smoothing
 from mdl import ADJ_CLOSE, HIGH, LOW, CLOSE
 
@@ -16,7 +17,6 @@ class Indicator(object):
 
     def calc(self, *args, **kwargs):
         raise NotImplementedError('{} has not implemented calc method'.format(self))
-
 
 
 class SMA(Indicator):
@@ -194,3 +194,15 @@ class CCI(Indicator):
                                   args=(period, constant)).rename(columns={'TP': 'CCI{}/{}'.format(period, constant)})
 
 
+class MarketVolatilityType(Indicator):
+    def _run(self, v):
+        d3 = (v[2] - v[1]) / 3
+        val = v[0]
+
+        return 0 if val < v[1] + d3 else 1 if val < v[2] - d3 else 2
+
+    def calc(self, period=20):
+        df = ATR.create(self.ticker_source).calc(period=period)
+        df_minmax = df.rolling(period).agg([np.min, np.max])
+        df_mvt = df.join(df_minmax).apply(self._run, axis=1).to_frame(name='MVT')
+        return df.join(df_minmax.join(df_mvt))
