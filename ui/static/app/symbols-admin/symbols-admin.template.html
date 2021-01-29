@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-lg-2">
-        <form id="addSymbolForm" action="#" ng-submit="$ctrl.addSymbol($event)">
+        <form id="addSymbolForm" action="#" ng-submit="$ctrl.addSymbol()">
             <div class="input-group">
                 <input type="text" ng-model="form.ticker" class="form-control">
                 <div class="input-group-btn">
@@ -24,7 +24,7 @@
     <tr ng-repeat="symbol in symbols">
         <td>{{symbol.ticker}}</td>
         <td>1900-01-01</td>
+        <td><button class="btn btn-default" ng-click="$ctrl.deleteSelected(symbol.ticker)">Delete</button></td>
     </tr>
     </tbody>
 </table>
-<!--<div ag-grid="gridOptions" class="ag-bootstrap" style="height: 100%;"></div>-->

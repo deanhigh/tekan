@@ -2,7 +2,12 @@ var app = require('express')();
 var proxy = require('express-http-proxy');
 var serveStatic = require('serve-static');
 
-app.use('/api', proxy('http://localhost:5000/api/'));
+var request = require('request');
+
+app.use('/api', function(req, res) {
+    var url = 'http://localhost:5000/api' + req.url;
+    req.pipe(request(url)).pipe(res);
+});
 
 app.use('/', serveStatic("./static"));
 
