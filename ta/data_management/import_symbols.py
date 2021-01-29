@@ -21,8 +21,8 @@ if __name__ == '__main__':
 
     if args.symbols_file:
         for s in get_symbols(args.symbols_file):
-            add_symbol(s)
+            Symbol(ticker=s).save()
     elif args.symbol:
-        add_symbol(Symbol(args.symbol))
+        Symbol(ticker=args.symbol).save()
     else:
         argsp.print_help()

@@ -1,69 +1,77 @@
-import json
 from logging import warning
 
 from pymongo import MongoClient
 
 from conf import MONGO
 from sources import MongoTickerSource
-from ta.mdl import DATE, Symbol
+from ta.db import Symbol, DATE, Workflow
+
+ADMIN_DB = 'admin'
+SYMBOLS_COL = 'symbols'
+WORKFLOW_COL = 'workflows'
+WORKFLOW_NODES_COL = 'workflow_nodes'
+
+TS_DB = 'quotes'
+
+mc = MongoClient(*MONGO)
 
 
-def insert(collection, df):
+def dataframe_to_mongo(df, symbol, overwrite=False):
+    """Insert a data frame into a collection"""
+    db = mc.get_database(TS_DB)
+    col = db.get_collection(symbol)
+    col.ensure_index(DATE, unique=True)
     for ts, data in df.to_dict('index').items():
         data[DATE] = ts.to_datetime()
         if data[DATE]:
-            collection.insert(data)
+            col.insert(data)
         else:
             print('error, no date {}', data)
 
 
-def get_collection(db, name, drop_col=False):
-    col = db.get_collection(name)
-    if drop_col:
-        col.drop()
-    col.ensure_index(DATE, unique=True)
-    return col
-
-
 def get_time_series(ticker):
-    with MongoTickerSource(ticker) as ts:
-        if ts.exists():
-            return ts.underlying_df()
-        else:
-            warning("%s does not exist in repository", ticker)
-
-
-def dataframe_to_mongo(df, symbol, overwrite=False):
-    with MongoClient(*MONGO) as mc:
-        db = mc.get_database('quotes')
-        col = get_collection(db, symbol, overwrite)
-        insert(col, df)
+    ts = MongoTickerSource(mc, ticker)
+    if ts.exists():
+        return ts.underlying_df()
+    else:
+        warning("%s does not exist in repository", ticker)
 
 
 def get_symbols():
-    with MongoClient(*MONGO) as mc:
-        db = mc.get_database('admin')
-        col = db.get_collection('symbols')
-        col.ensure_index('ticker')
-        return [Symbol(x['ticker']) for x in col.find()]
+    return [x for x in Symbol.objects()]
 
 
-def add_symbol(symbol):
-    with MongoClient(*MONGO) as mc:
-        db = mc.get_database('admin')
-        col = db.get_collection('symbols')
-        col.ensure_index('ticker')
-        if type(symbol) is Symbol:
-            col.insert(symbol.__dict__)
-        elif type(symbol) is dict:
-            col.insert(symbol)
-        return col
+def get_symbol(ticker):
+    return Symbol.objects(ticker=ticker).first()
+
+
+def create_symbol(symbol):
+    if type(symbol) is Symbol:
+        symbol.save()
+    else:
+        raise TypeError('Unable to store type %s as symbol' % type(symbol))
 
 
 def delete_symbol(ticker):
-    with MongoClient(*MONGO) as mc:
-        db = mc.get_database('admin')
-        col = db.get_collection('symbols')
-        col.ensure_index('ticker')
-        return col.delete_many({'ticker': ticker})
+    s = Symbol.objects(ticker=ticker)
+    s.delete()
 
+
+def create_workflow(workflow):
+    if type(workflow) is Workflow:
+        workflow.save()
+    else:
+        raise TypeError('Unable to store type %s as workflow' % type(workflow))
+
+
+def delete_workflow(workflow_name):
+    s = Workflow.objects(name=workflow_name)
+    s.delete()
+
+
+def get_workflows():
+    return [x for x in Workflow.objects()]
+
+
+def get_workflow(name):
+    return Workflow.objects(name=name).first()

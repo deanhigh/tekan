@@ -2,7 +2,7 @@ import pandas as pd
 from pymongo import MongoClient
 
 from conf import MONGO
-from ta.mdl import HIGH, LOW, OPEN, CLOSE, ADJ_CLOSE, VOLUME, DATE
+from ta.db import HIGH, LOW, OPEN, CLOSE, ADJ_CLOSE, VOLUME, DATE
 
 MONGO_DATABASE_NAME = 'quotes'
 
@@ -16,17 +16,13 @@ class TickerSource(object):
 
 
 class MongoTickerSource(TickerSource):
-    def __init__(self, ticker):
+    def __init__(self, mc, ticker):
+        """ Mongo client """
         super(MongoTickerSource, self).__init__()
+        self.mc = mc
         self.ticker = ticker
         self.data = None
-
-    def __enter__(self):
-        self.mc = MongoClient(*MONGO)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.mc.close()
+        self.index = None
 
     def exists(self):
         return self.ticker in self.mc.get_database(MONGO_DATABASE_NAME).collection_names()
