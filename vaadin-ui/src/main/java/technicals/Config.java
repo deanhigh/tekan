@@ -43,9 +43,10 @@ public class Config {
 
     public String saveWorkflow(Workflow wf) {
         MongoOperations mongoOps = new MongoTemplate(client, database);
-        mongoOps.insert(wf);
+        mongoOps.save(wf);
         return wf.getId();
     }
+
 
     public List<Workflow> getWorkflows() {
         MongoOperations mongoOps = new MongoTemplate(client, database);

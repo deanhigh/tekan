@@ -19,3 +19,4 @@ flask-cors
 flask_restful
 mongomock
 mongokit
+TA-Lib

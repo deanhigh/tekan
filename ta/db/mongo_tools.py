@@ -15,7 +15,6 @@ TS_DB = 'quotes'
 
 mc = MongoClient(*MONGO)
 
-
 def dataframe_to_mongo(df, symbol, overwrite=False):
     """Insert a data frame into a collection"""
     db = mc.get_database(TS_DB)
@@ -27,7 +26,6 @@ def dataframe_to_mongo(df, symbol, overwrite=False):
             col.insert(data)
         else:
             print('error, no date {}', data)
-
 
 def get_time_series(ticker):
     ts = MongoTickerSource(mc, ticker)

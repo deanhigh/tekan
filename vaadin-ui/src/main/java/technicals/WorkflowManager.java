@@ -23,6 +23,13 @@ public class WorkflowManager {
 
     public BeanItemContainer<Measure> getMeasuresContainer() {
         BeanItemContainer<Measure> ctn = new BeanItemContainer<>(Measure.class);
+        getCurrentWorkflow().getMeasures();
+        getCurrentWorkflow().getMeasures().forEach(ctn::addBean);
         return ctn;
+    }
+
+    public void saveCurrentWorkflow() {
+        if(currentWorkflow  != null)
+            Config.client(null).get().saveWorkflow(currentWorkflow);
     }
 }

@@ -146,6 +146,7 @@ public class TaUI extends UI {
                 Measure m  = new Measure();
                 m.setName(name.getValue());
                 workflowManager.getCurrentWorkflow().getMeasures().add(m);
+                workflowManager.saveCurrentWorkflow();
         });
         popupContent.addComponent(name);
         popupContent.addComponent(type);
