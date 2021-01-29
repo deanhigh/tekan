@@ -15,7 +15,7 @@ angular.module('symbolsAdmin').factory('SymbolSync',
 
 angular.module('symbolsAdmin').component('symbolsAdmin', {
     templateUrl: 'app/symbols-admin/symbols-admin.template.html',
-    controller: function SymbolsListController($scope, Symbol, SymbolSync) {
+    controller: function SymbolsAdminController($scope, Symbol, SymbolSync) {
         this.symbols = Symbol.query(function (data) {
             $scope.symbols = data;
         });

@@ -1,6 +1,4 @@
-/**
- * Created by dean.high on 15/10/2016.
- */
+'use strict';
 
 angular.
 module('techAnalysisApplication').
@@ -8,11 +6,11 @@ config(['$locationProvider', '$routeProvider',
     function config($locationProvider, $routeProvider) {
         $locationProvider.hashPrefix('!');
         $routeProvider.
-        when('/symbols', {
-            template:   '<symbols-admin></symbols-admin>'
+        when('/time-series', {
+            template: '<time-series></time-series>'
         }).
-        when('/ts', {
-            template: '<ts-viewer></ts-viewer>'
+        when('/symbols', {
+            template: '<symbols-admin></symbols-admin>'
         }).
         otherwise('/symbols');
     }

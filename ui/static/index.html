@@ -10,13 +10,12 @@
     <script src="libs/angular/angular.js"></script>
     <script src="libs/angular-resource/angular-resource.js"></script>
     <script src="libs/angular-route/angular-route.js"></script>
-    <script src="app/symbols-admin/symbols-admin.module.js"></script>
-    <script src="app/symbols-admin/symbols-admin.component.js"></script>
-    <script src="app/ts-viewer/ts-viewer.module.js"></script>
-    <script src="app/ts-viewer/ts-viewer.component.js"></script>
     <script src="app/app.module.js"></script>
     <script src="app/app.config.js"></script>
-
+    <script src="app/time-series/time-series.module.js"></script>
+    <script src="app/time-series/time-series.component.js"></script>
+    <script src="app/symbols-admin/symbols-admin.module.js"></script>
+    <script src="app/symbols-admin/symbols-admin.component.js"></script>
 </head>
 
 <body>
@@ -27,10 +26,11 @@
                 <a class="nav-link" href="#!/symbols">Symbols</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#!/ts">TimeSeries</a>
+                <a class="nav-link" href="#!/time-series">TimeSeries</a>
             </li>
         </ul>
     </nav>
     <div ng-view></div>
+
 </body>
 </html>
