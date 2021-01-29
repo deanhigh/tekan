@@ -1,10 +1,7 @@
-# from functools import reduce
-
 from ta.mdl import DataSet
 
 
 class IndicatorDataSetWrapper(DataSet):
-
     def __init__(self, id, indicator):
         super(IndicatorDataSetWrapper, self).__init__(id)
         self.indicator = indicator

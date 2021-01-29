@@ -4,7 +4,7 @@ from time import strptime
 import pandas as pd
 
 from ta.indicators.crossovers import CrossOver, CrossUnder
-from ta.mdl import DataSet, Series
+from ta.mdl import DataSet, SeriesPointer
 
 
 class TestJoinedIndicators(unittest.TestCase):
@@ -15,8 +15,8 @@ class TestJoinedIndicators(unittest.TestCase):
         ds.data_frame = pd.DataFrame(
             {'A': pd.Series([3., 5.], index=idx),
              'B': pd.Series([3., 4.], index=idx)})
-        self.assertTrue(CrossOver(Series(ds, 'A'), Series(ds, 'B')).apply(idx[1]))
-        self.assertTrue(CrossUnder(Series(ds, 'B'), Series(ds, 'A')).apply(idx[1]))
+        self.assertTrue(CrossOver(SeriesPointer(ds, 'A'), SeriesPointer(ds, 'B')).apply(idx[1]))
+        self.assertTrue(CrossUnder(SeriesPointer(ds, 'B'), SeriesPointer(ds, 'A')).apply(idx[1]))
 
     # def test_crossover(self):
     #     sma_20 = SMA(self.ds, period=20, field=ADJ_CLOSE)

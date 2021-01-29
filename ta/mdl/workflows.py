@@ -1,42 +1,79 @@
-from pandas import DataFrame, Series
+import yaml
 
 
-class WorkflowDescriptor(object):
-    pass
+
+class WorkflowLoader(object):
+    def __init__(self, sources, indicators):
+        self.sources = sources
+        self.indicators = indicators
+
+    @staticmethod
+    def load_wf_entry(entry):
+        cls = entry['class']
+        components = cls.split('.')
+        mod = __import__(components[0])
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod.from_descriptor(**entry)
+
+    @classmethod
+    def from_yaml(cls, yaml_file):
+        with open(yaml_file, 'r') as f:
+            return WorkflowLoader.from_dict(yaml.load(f))
+
+    @classmethod
+    def from_dict(cls, desc):
+        ret = cls({x['id']:cls.load_wf_entry(x) for x in desc['sources']},
+                  {x['id']:cls.load_wf_entry(x) for x in desc['indicators']})
+        return ret
+
+    def get_datasets(self):
+        ret = dict()
+        for i in self.sources.values():
+            ret.update(i.series_pointers())
+        for i in self.indicators.values():
+            ret.update(i.output_pointers())
+        return ret
 
 
 class WorkflowContext(object):
+    """
+    The workflow context contains and manages the current running set of data.
+    """
     def __init__(self):
-        self.__ts_data_frame = DataFrame()
-        self.__ts_ids = set()
+        self.__data_sets = dict()
+        self.__ = dict()
 
     @classmethod
-    def blank(cls):
-        """ Create a blank workflow context builder which can be used to programatically build workflows """
-        return cls()
+    def load(cls, loader):
+        wc = cls()
+        wc.datasets.update(loader.get_datasets())
+        return wc
 
-    @classmethod
-    def from_descriptor(cls, workflow_descriptor):
-        """ Create a workflow from a workflow descriptor """
-        pass
+    def add_dataset(self, dataset):
+        self.datasets[dataset.id] = dataset
 
-    def add_ts_data(self, data):
-        """ Add pandas series or dataframe to the set, raise DuplicateTimeSeries if series alread exists"""
-        columns_to_add = {data.name} if isinstance(data, Series) else {x for x in data.columns.values}
-        dupes = self.__ts_ids.intersection(columns_to_add)
-        if len(dupes) > 0:
-            raise DuplicateTimeSeries(duplicate_columns=dupes)
+    def add_indicator(self, indicator):
+        self.indicator[indicator.id] = indicator
 
-        self.__ts_data_frame += data
-        self.__ts_ids.update(columns_to_add)
+    def get_or_create_dataset(self, dataset_id, create_func=None):
+        """
+        Gets the identified dataset if it is found. If its not found it will attempt to create using create func.
+        """
+        if dataset_id not in self.datasets and create_func:
+            self.datasets[dataset_id] = create_func
+        return self.datasets[dataset_id]
+
+    def get_data(self, data_id):
+        """
+        Gets the identified dataset if it is found. If its not found it will attempt to create using create func.
+        """
+        return self.datasets[data_id].data
 
     @property
-    def ts_ids(self):
-        return self.__ts_ids
+    def datasets(self):
+        return self.__data_sets
 
-    @property
-    def ts_data_frame(self):
-        return self.__ts_data_frame
 
 
 class DuplicateTimeSeries(Exception):

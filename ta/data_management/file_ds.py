@@ -1,14 +1,22 @@
-from pandas import DataFrame
+import pandas
+from pandas import DataFrame, read_csv
 
-from ta.mdl import DataSource
+from ta.mdl import DataFrameDataSet, ExportableDataFrameDataSet
 
-class FileSource(DataSource):
-    def __init__(self, id, filename):
-        super(FileSource, self).__init__(id)
+
+
+class FileSource(DataFrameDataSet, ExportableDataFrameDataSet):
+    def __init__(self, id, filename, fields=None):
+        super(FileSource, self).__init__(id, fields)
+        self.fields = fields
         self.filename = filename
 
-    def load(self):
-        self.data_frame = DataFrame.from_csv(self.filename)
+    @classmethod
+    def from_descriptor(cls, **kwargs):
+        return cls(kwargs['id'], kwargs['filename'], kwargs.get('fields'))
 
-    def save(self, filename=None):
-        return self.data_frame.to_csv(filename if filename else self.filename)
+    def load(self):
+        if self.fields:
+            self.data_frame = read_csv(self.filename, index_col=0, parse_dates=True).rename(columns=self.fields)
+        else:
+            self.data_frame = read_csv(self.filename, index_col=0, parse_dates=True)

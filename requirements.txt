@@ -20,3 +20,4 @@ flask_restful
 mongomock
 mongokit
 TA-Lib
+riak
