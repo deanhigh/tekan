@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from conf import MONGO
 from mdl import DATE, ADJ_CLOSE, HIGH, LOW, CLOSE, VOLUME, OPEN
-from numpy.core.numeric import ndarray, NaN, nan
 from pymongo import MongoClient
+from logging import info
 
 MONGO_DATABASE_NAME = 'quotes'
 
@@ -81,7 +81,7 @@ class MA(Measure):
 class STDDEV(Measure):
     def std(self, period=20, field=ADJ_CLOSE):
         return self.ticker_source.underlying_field_df(field).rolling(period).std().rename(
-            columns={field: 'STD{}'.format(period)})
+            columns={field: 'STDDEV{}'.format(period)})
 
 
 class TR(Measure):
@@ -207,16 +207,14 @@ class ADX(Measure):
         prep = di.apply(partial(self._didiff, period), axis=1).to_frame(name='DIFF').join(
             di.apply(partial(self._disum, period), axis=1).to_frame(name='SUM'))
         dx = prep.apply(self._dx, axis=1).to_frame(name='DX')
-        return dx.join(dx.rolling(period).apply(Smoothing.smoothing(period)).rename(columns={'DX': 'ADX{}'.format(period)}))
+        return di.join(dx.join(dx.rolling(period).apply(Smoothing.smoothing(period)).rename(columns={'DX': 'ADX{}'.format(period)})))
 
 
-def get_all_indicators_df(symbol):
-    with MongoTickerSource(symbol) as ts:
-        df = ts.underlying_df()
-        # df = df.join(TR.create(ts).tr())
-        # df = df.join(ATR.create(ts).atr())
-        # df = df.join(SmootherDM.create(ts).smoothed_dm())
-        df = df.join(ADX.create(ts).adx())
+def get_all_indicators_df(ticker_source):
+        df = ticker_source.underlying_df()
+        df = df.join(STDDEV.create(ticker_source).std())
+        df = df.join(ATR.create(ticker_source).atr())
+        df = df.join(ADX.create(ticker_source).adx())
         return df
 
 

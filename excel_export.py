@@ -26,11 +26,19 @@ def export_underlying(symbol, output_directory, output_filename=None):
             df = ts.underlying_df()
             export_dataframe(df, os.path.join(output_directory, output_filename), 'Underlying')
         else:
-            warning("%s does not exist in mongodb", symbol)
+            warning("%s does not exist in repository", symbol)
+
 
 def export_symbols_in_file(symbols_file, output_dir):
     for s in get_symbols(symbols_file):
-        export_underlying(s, output_dir)
+        with MongoTickerSource(s) as ts:
+            if ts.exists():
+                info("Calculating indicators for %s", s)
+                export_dataframe(get_all_indicators_df(ts), os.path.join(output_dir, "{}.xlsx".format(s)), 'All Data')
+            else:
+                warning("Symbol %s not found in repository", s)
+
+
 
 if __name__ == '__main__':
 
@@ -46,7 +54,11 @@ if __name__ == '__main__':
     if args.symbols_file:
         export_symbols_in_file(args.symbols_file, args.out_dir)
     elif args.symbol:
-        export_dataframe(get_all_indicators_df(args.symbol), "{}.xlsx".format(args.symbol), 'All Data')
-        #export_underlying(args.symbol, args.out_dir)
+        with MongoTickerSource(args.symbol) as ts:
+            if ts.exists():
+                df = ts.underlying_df()
+                export_dataframe(get_all_indicators_df(args.symbol), os.path.join(args.out_dir,"{}.xlsx".format(args.symbol)), 'All Data')
+            else:
+                warning("%s does not exist in repository", args.symbol)
     else:
         argsp.print_help()
