@@ -1,8 +1,10 @@
 import json
+from logging import warning
 
 from pymongo import MongoClient
 
 from conf import MONGO
+from sources import MongoTickerSource
 from ta.mdl import DATE, Symbol
 
 
@@ -21,6 +23,14 @@ def get_collection(db, name, drop_col=False):
         col.drop()
     col.ensure_index(DATE, unique=True)
     return col
+
+
+def get_time_series(ticker):
+    with MongoTickerSource(ticker) as ts:
+        if ts.exists():
+            return ts.underlying_df()
+        else:
+            warning("%s does not exist in repository", ticker)
 
 
 def dataframe_to_mongo(df, symbol, overwrite=False):
@@ -56,3 +66,4 @@ def delete_symbol(ticker):
         col = db.get_collection('symbols')
         col.ensure_index('ticker')
         return col.delete_many({'ticker': ticker})
+
