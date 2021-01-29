@@ -36,7 +36,7 @@ def get_collection(db, name):
 
 
 def to_mongo():
-    mc = MongoClient('localhost', 27017)
+    mc = MongoClient('192.168.99.100', 27017)
     db = mc.get_database('quotes')
     for t in tickers:
         ticker = Ticker(t)
