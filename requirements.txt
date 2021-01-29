@@ -4,4 +4,7 @@ numpy==1.11.0
 pandas==0.18.1
 pymongo==3.2.2
 matplotlib==1.5.1
-
+pyyaml==3.11
+xlsxwriter==0.9.2
+pandas-datareader>=0.2.1
+pandas-finance>=0.1.1

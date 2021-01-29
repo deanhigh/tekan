@@ -1,48 +1,34 @@
 'http://query.yahooapis.com/v1/public/yql'
-from pprint import pprint
+import argparse
 
-from pymongo import MongoClient
-from pymongo.errors import BulkWriteError
-
-from mdl import CSV_ROW, DATE
-from mdl.ticker import Ticker
-
-tickers = ['ADBE']
-ts_range = ('2005-01-01', '2016-06-17')
+import pandas_datareader.data as web
+import yaml
+from conf import TS_RANGE
+from mongo_tools import dataframe_to_mongo
 
 
-def to_csv():
-    import csv
-    for t in tickers:
-        ticker = Ticker(t)
-        with open('{}.csv'.format(t), 'w') as f:
-            csvw = csv.writer(f)
-            csvw.writerow(CSV_ROW)
-            for r in ticker.get_ts(CSV_ROW, ts_range):
-                csvw.writerow([r[x] for x in CSV_ROW])
+def get_symbols(symbol_file='symbols.yml'):
+    with open(symbol_file) as f:
+        yml = yaml.load(f)
+        return yml['symbols']
 
 
-def bulk_insert(collection, data):
-    try:
-        collection.insert_many(data)
-    except BulkWriteError as e:
-        pprint(e.details)
-
-
-def get_collection(db, name):
-    col = db.get_collection(name)
-    col.ensure_index(DATE, unique=True)
-    return col
-
-
-def to_mongo():
-    mc = MongoClient('192.168.99.100', 27017)
-    db = mc.get_database('quotes')
-    for t in tickers:
-        ticker = Ticker(t)
-        col = get_collection(db, t)
-        bulk_insert(col, ticker.get_ts(CSV_ROW, ts_range))
+def fetch_symbol_data(symbol):
+    df = web.DataReader(symbol, 'yahoo', *TS_RANGE)
+    dataframe_to_mongo(df, symbol)
 
 
 if __name__ == '__main__':
-    to_mongo()
+    argsp = argparse.ArgumentParser('Retrieve data from sources and insert into mongo')
+    argsp.add_argument('-s', action='store', dest='symbol', help='Symbol to retrieve')
+    argsp.add_argument('-f', action='store_true', dest='symbols_file', default=False, help='Retrieve in symbols file')
+    args = argsp.parse_args()
+
+    if args.symbols_file:
+        for s in get_symbols(args.symbols_file):
+            fetch_symbol_data(s)
+    elif args.symbol:
+        fetch_symbol_data(args.symbol)
+    else:
+        argsp.print_help()
+
