@@ -13,9 +13,14 @@
     "run-sequence": "^1.0.2",
     "serve-static": "1.11.1",
     "connect": "3.4.1",
-    "bootstrap": "4.0.0-alpha.3",
+    "bootstrap": "3.3.6",
     "datatables.net": "1.10.12",
-    "datatables.net-bs": "1.10.12"
+    "datatables.net-bs": "1.10.12",
+    "browserify": "13.1.0",
+    "requirejs":"2.2.0",
+    "gulp-browserify":"0.5.1",
+    "bower":"1.7.9",
+    "gulp-bower":"0.0.13"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -28,16 +33,10 @@
       "test": "test"
     }
   },
-  "homepage": "https://html5boilerplate.com/",
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.txt"
-  },
-  "name": "html5-boilerplate",
+  "name": "ta-tools-ui",
   "private": true,
   "scripts": {
-    "build": "gulp build",
-    "test": "gulp archive && mocha --reporter spec --timeout 5000"
+    "build": "gulp build"
   },
   "version": "5.3.0"
 }

@@ -1,15 +1,12 @@
-var fs = require('fs');
-var path = require('path');
 var gulp = require('gulp');
+var bower = require('gulp-bower');
 
-// Load all gulp plugins automatically
-// and attach them to the `plugins` object
+gulp.task('bower', function() {
+    return bower();
+});
+
 var plugins = require('gulp-load-plugins')();
-
-// Temporary solution until gulp 4
-// https://github.com/gulpjs/gulp/issues/355
 var runSequence = require('run-sequence');
-
 var pkg = require('./package.json');
 var dirs = pkg['h5bp-configs'].directories;
 
@@ -19,42 +16,26 @@ var dirs = pkg['h5bp-configs'].directories;
 
 gulp.task('clean', function (done) {
     require('del')([
-        dirs.archive,
         dirs.dist
     ]).then(function () {
         done();
     });
 });
 
-gulp.task('copy', [
-    'copy:jquery',
-    'copy:bootstrap',
-    'copy:src_to_dist'
-]);
+gulp.task('copy', ['copy:src_to_dist']);
 
-gulp.task('copy:jquery', function () {
-    return gulp.src(['node_modules/jquery/dist/*'])
-               .pipe(gulp.dest(dirs.src + '/js/vendor/'));
-});
-
-gulp.task('copy:bootstrap', ['copy:bootstrap_css', 'copy:bootstrap_js']);
-
-gulp.task('copy:bootstrap_css', function () {
-    return gulp.src('node_modules/bootstrap/dist/css/*')
-               .pipe(gulp.dest(dirs.src+'/css/vendor/'));
-});
-
-gulp.task('copy:bootstrap_js', function () {
-    return gulp.src('node_modules/bootstrap/dist/js/*')
-        .pipe(gulp.dest(dirs.src+'/js/vendor/'));
+gulp.task('copy:bower_components', function () {
+    return gulp.src(['bower_components/**/*'])
+               .pipe(gulp.dest(dirs.src + '/bower_components/'));
 });
 
 gulp.task('copy:src_to_dist', function () {
     return gulp.src([
-        // Copy all files
-        dirs.src + '/**/*',
+        // Copy all files excluding main.js
+        dirs.src + '/**/*'
     ],
         {
+
             // Include hidden files by default
             dot: true
         }).pipe(gulp.dest(dirs.dist));
@@ -66,6 +47,8 @@ gulp.task('copy:src_to_dist', function () {
 gulp.task('build', function (done) {
     runSequence(
         ['clean'],
+        'bower',
+        'copy:bower_components',
         'copy',
     done);
 });
