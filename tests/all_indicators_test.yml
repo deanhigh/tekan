@@ -25,7 +25,19 @@ indicators:
     low_data_id: SYM.LOW
     period: 20
   - id: SYM.NATR
-    class: ta.indicators.tr.NATR
+    class: ta.indicators.NATR
+    close_data_id: SYM.ADJ_CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
+    period: 20
+  - id: SYM.DX
+    class: ta.indicators.DX
+    close_data_id: SYM.ADJ_CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
+    period: 20
+  - id: SYM.ADX
+    class: ta.indicators.ADX
     close_data_id: SYM.ADJ_CLOSE
     high_data_id: SYM.HIGH
     low_data_id: SYM.LOW
