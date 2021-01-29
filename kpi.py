@@ -106,6 +106,14 @@ class SMA(Indicator):
             columns={field: 'MA{}'.format(period)})
 
 
+class EWMA(Indicator):
+    """ Exponentially weighted moving average """
+
+    def calc(self, span=20, field=ADJ_CLOSE):
+        return self.ticker_source.underlying_field_df(field).ewm(span=span).mean().rename(
+            columns={field: 'EMA{}'.format(span)})
+
+
 class STDDEV(Indicator):
     """Standard deviation of a field"""
 
@@ -265,10 +273,12 @@ class CCI(Indicator):
                                   args=(period, constant)).rename(columns={'TP': 'CCI{}/{}'.format(period, constant)})
 
 
-def get_all_indicators_df(ticker_source):
-    ind = [STDDEV, SMA, ATR, ATRP, ADX, CCI]
+def get_all_indicators_df(ticker_source, ind=(STDDEV, SMA, EWMA, ATR, ATRP, ADX, CCI)):
     return reduce(lambda df, ndf: df.join(ndf.create(ticker_source).calc()), ind, ticker_source.underlying_df())
 
 
 if __name__ == '__main__':
-    plt.style.use('dark_background')
+    with MongoTickerSource('^GSPC') as t:
+        plt.style.use('dark_background')
+        t.underlying_field_df(ADJ_CLOSE).join(EWMA.create(t).calc()).join(EWMA.create(t).calc(50)).join(EWMA.create(t).calc(100)).plot()
+        plt.show()
