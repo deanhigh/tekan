@@ -29,6 +29,9 @@ class MongoTickerSource(TickerSource):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.mc.close()
 
+    def exists(self):
+        return self.ticker in self.mc.get_database(MONGO_DATABASE_NAME).collection_names()
+
     def all_data(self, col):
         if not self.data:
             self.data = [x for x in self.mc.get_database(MONGO_DATABASE_NAME).get_collection(col).find()]
