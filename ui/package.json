@@ -1,0 +1,43 @@
+{
+  "devDependencies": {
+    "del": "^2.0.2",
+    "glob": "^6.0.1",
+    "gulp": "^3.8.11",
+    "gulp-autoprefixer": "^3.0.2",
+    "gulp-header": "^1.2.2",
+    "gulp-jscs": "^3.0.1",
+    "gulp-load-plugins": "^1.1.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-replace": "^0.5.3",
+    "jquery": "1.12.0",
+    "run-sequence": "^1.0.2",
+    "serve-static": "1.11.1",
+    "connect": "3.4.1",
+    "bootstrap": "4.0.0-alpha.3",
+    "datatables.net": "1.10.12",
+    "datatables.net-bs": "1.10.12"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "h5bp-configs": {
+    "directories": {
+      "archive": "archive",
+      "dist": "dist",
+      "src": "src",
+      "test": "test"
+    }
+  },
+  "homepage": "https://html5boilerplate.com/",
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.txt"
+  },
+  "name": "html5-boilerplate",
+  "private": true,
+  "scripts": {
+    "build": "gulp build",
+    "test": "gulp archive && mocha --reporter spec --timeout 5000"
+  },
+  "version": "5.3.0"
+}
