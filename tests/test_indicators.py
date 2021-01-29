@@ -15,6 +15,8 @@ basic_test_data = [
     {'ind_name': 'SYM.EMA20', 'ind_cls': EMA, 'test_points': {'2016-12-28': 2286.7962876973415}},
     {'ind_name': 'SYM.STDDEV20', 'ind_cls': STDDEV, 'test_points': {'2016-12-28': 274.28670333248476}},
     {'ind_name': 'SYM.TR', 'ind_cls': TR, 'test_points': {'2016-12-28': 2580.0899999999997}},
+    {'ind_name': 'SYM.ATR', 'ind_cls': ATR, 'test_points': {'2016-12-28': 1799.2082310527996}},
+    {'ind_name': 'SYM.NATR', 'ind_cls': NATR, 'test_points': {'2016-12-28': 65.756929665873571}},
 ]
 
 
@@ -34,6 +36,7 @@ class TestIndicators(unittest.TestCase):
         self.assertEqual(len(result), length)
         for p in test_points.items():
             self.assertEqual(result[p[0]], p[1])
+
 
 if __name__ == '__main__':
     unittest.main()

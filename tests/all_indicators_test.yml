@@ -18,6 +18,18 @@ indicators:
     close_data_id: SYM.ADJ_CLOSE
     high_data_id: SYM.HIGH
     low_data_id: SYM.LOW
+  - id: SYM.ATR
+    class: ta.indicators.tr.ATR
+    close_data_id: SYM.ADJ_CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
+    period: 20
+  - id: SYM.NATR
+    class: ta.indicators.tr.NATR
+    close_data_id: SYM.ADJ_CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
+    period: 20
 sources:
   - id: SYM.LOADER
     class: ta.data_management.file_ds.FileSource
