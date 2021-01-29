@@ -57,7 +57,7 @@ if __name__ == '__main__':
         with MongoTickerSource(args.symbol) as ts:
             if ts.exists():
                 df = ts.underlying_df()
-                export_dataframe(get_all_indicators_df(args.symbol), os.path.join(args.out_dir,"{}.xlsx".format(args.symbol)), 'All Data')
+                export_dataframe(get_all_indicators_df(ts), os.path.join(args.out_dir,"{}.xlsx".format(args.symbol)), 'All Data')
             else:
                 warning("%s does not exist in repository", args.symbol)
     else:

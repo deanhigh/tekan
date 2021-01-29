@@ -1,13 +1,11 @@
-from functools import partial
-
 import math
+from functools import partial, reduce
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from conf import MONGO
 from mdl import DATE, ADJ_CLOSE, HIGH, LOW, CLOSE, VOLUME, OPEN
 from pymongo import MongoClient
-from logging import info
 
 MONGO_DATABASE_NAME = 'quotes'
 
@@ -207,24 +205,49 @@ class ADX(Measure):
         prep = di.apply(partial(self._didiff, period), axis=1).to_frame(name='DIFF').join(
             di.apply(partial(self._disum, period), axis=1).to_frame(name='SUM'))
         dx = prep.apply(self._dx, axis=1).to_frame(name='DX')
-        return di.join(dx.join(dx.rolling(period).apply(Smoothing.smoothing(period)).rename(columns={'DX': 'ADX{}'.format(period)})))
+        return di.join(dx.join(
+            dx.rolling(period).apply(Smoothing.smoothing(period)).rename(columns={'DX': 'ADX{}'.format(period)})))
+
+
+class TypicalPrice(Measure):
+    """ The typical price is the average of High, Low & Close prices"""
+
+    def _combine_data(self):
+        return self.ticker_source.underlying_field_df(HIGH). \
+            join(self.ticker_source.underlying_field_df(LOW)). \
+            join(self.ticker_source.underlying_field_df(CLOSE))
+
+    def tp(self):
+        in_data = self._combine_data()
+        return in_data.apply(lambda v: (v[HIGH] + v[LOW] + v[CLOSE]) / 3, axis=1).to_frame('TP')
+
+
+class CCI(Measure):
+    """ See http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:commodity_channel_index_cci """
+
+    def _cci(self, typical_prices, *args):
+        period = args[0]
+        constant = args[1]
+        mean = sum(typical_prices) / period
+        mean_deviation = reduce(lambda x, y: x + abs(mean - y), typical_prices, 0) / period
+        cci = (typical_prices[-1] - mean) / (constant * mean_deviation)
+        return cci
+
+    def cci(self, period=20, constant=0.015):
+        return TypicalPrice.create(self.ticker_source).tp().\
+            rolling(period).apply(self._cci,
+                                  args=(period, constant)).rename(columns={'TP': 'CCI{}/{}'.format(period, constant)})
 
 
 def get_all_indicators_df(ticker_source):
-        df = ticker_source.underlying_df()
-        df = df.join(STDDEV.create(ticker_source).std())
-        df = df.join(ATR.create(ticker_source).atr())
-        df = df.join(ADX.create(ticker_source).adx())
-        return df
+    df = ticker_source.underlying_df()
+    df = df.join(STDDEV.create(ticker_source).std())
+    df = df.join(ATR.create(ticker_source).atr())
+    df = df.join(ADX.create(ticker_source).adx())
+    df = df.join(TypicalPrice.create(ticker_source).tp())
+    df = df.join(CCI.create(ticker_source).cci())
+    return df
 
-
-#
-# def plot_samples():
-#     with MongoTickerSource('ADBE') as ts:
-#         df = ts.underlying_field_df().join(ts.underlying_field_df(HIGH)).join(ts.underlying_field_df(LOW)).join(
-#             ts.underlying_field_df(ADJ_CLOSE)). \
-#             join(TR.create(ts).tr()).join(ATR.atr())
-#         df.to_csv('ADBE')
 
 if __name__ == '__main__':
     plt.style.use('dark_background')
