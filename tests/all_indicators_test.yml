@@ -42,6 +42,12 @@ indicators:
     high_data_id: SYM.HIGH
     low_data_id: SYM.LOW
     period: 20
+  - id: SYM.CCI
+    class: ta.indicators.CCI
+    close_data_id: SYM.ADJ_CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
+    period: 20
 sources:
   - id: SYM.LOADER
     class: ta.data_management.file_ds.FileSource

@@ -22,12 +22,19 @@ class DX(Indicator):
                       index=low_series.index.values)
 
 
-
 class ADX(DX):
-
     def calc(self, context):
         low_series = context.get_data(self.low_data_id)
         high_series = context.get_data(self.high_data_id)
         close_series = context.get_data(self.close_data_id)
         return Series(talib.ADX(high_series.values, low_series.values, close_series.values, self.period),
+                      index=low_series.index.values)
+
+
+class CCI(DX):
+    def calc(self, context):
+        low_series = context.get_data(self.low_data_id)
+        high_series = context.get_data(self.high_data_id)
+        close_series = context.get_data(self.close_data_id)
+        return Series(talib.CCI(high_series.values, low_series.values, close_series.values, self.period),
                       index=low_series.index.values)
