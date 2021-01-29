@@ -2,6 +2,7 @@ import datetime as datetime
 
 from pandas_datareader import data
 
+from conf import MONGO
 from ta.mdl import DataFrameDataSet
 
 

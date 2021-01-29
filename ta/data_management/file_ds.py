@@ -2,11 +2,19 @@ import pandas
 from pandas import DataFrame, read_csv
 
 from conf import get_full_data_path
-from ta.mdl import DataFrameDataSet, ExportableDataFrameDataSet
+from ta.mdl import DataFrameDataSet, Writer
 
 
+class CsvFileWriter(Writer):
 
-class FileSource(DataFrameDataSet, ExportableDataFrameDataSet):
+    def __init__(self, filename):
+        self.filename = filename
+
+    def write(self, data_frame):
+        data_frame.to_csv(self.filename)
+
+
+class FileSource(DataFrameDataSet):
     def __init__(self, id, filename, fields=None):
         super(FileSource, self).__init__(id, fields)
         self.fields = fields

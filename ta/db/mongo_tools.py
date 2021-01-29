@@ -13,10 +13,10 @@ ADMIN_DB = 'admin'
 SYMBOLS_COL = 'symbols'
 WORKFLOW_COL = 'workflows'
 WORKFLOW_NODES_COL = 'workflow_nodes'
-
-TS_DB = 'quotes'
+TS_DB = 'ts'
 
 mc = MongoClient(*MONGO)
+
 
 def dataframe_to_mongo(df, symbol, overwrite=False):
     """Insert a data frame into a collection"""

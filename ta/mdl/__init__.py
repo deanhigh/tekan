@@ -52,10 +52,17 @@ class DataFrameDataSet(DataSet):
 
     data_frame = property(__get_data_frame, __set_data_frame)
 
+    def save(self, writer):
+        return writer.write(self.data_frame)
 
-class ExportableDataFrameDataSet(object):
-    def save(self, filename):
-        return self.data_frame.to_csv(filename)
+class Writer(object):
+    def write(self, data_frame):
+        raise NotImplementedError
+
+
+# class ExportableDataFrameDataSet(object):
+#     def save(self, writer):
+#         return writer.write(self.data_frame)
 
 
 class SeriesPointer(object):

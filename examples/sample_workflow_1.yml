@@ -1,7 +1,7 @@
 sources:
   - id: SYM.LOADER
     class: ta.data_management.file_ds.FileSource
-    filename: tests/test_data_frame.csv
+    filename: examples/samples/^DJI.csv
     fields:
       'Adj Close': SYM.ADJ_CLOSE
       'Open': SYM.OPEN

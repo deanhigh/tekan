@@ -89,11 +89,13 @@ class TestProcessingTrigger(unittest.TestCase):
         trigger.action = CallbackAction(callback)
         self.assertRaises(CallbackCalled, trigger.apply, self.wc)
 
+    def test_trigger_log_alert(self):
+        self.fail("Log an alert in the alert log when the trigger it true")
+
 
 class CallbackCalled(Exception):
     def __init__(self):
         super(CallbackCalled, self).__init__()
-
 
 
 class TestAction(unittest.TestCase):

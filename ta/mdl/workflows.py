@@ -13,7 +13,7 @@ def load_workflow_entry(entry, default_cls=None):
     """
     try:
         mod = cls = entry.get('class', default_cls)
-        log.debug("Loading workflow entry cls= %s", mod)
+        log.debug("Loading workflow entry cls=%s", mod)
         if isinstance(cls, str):
             components = cls.split('.')
             mod = __import__(components[0])

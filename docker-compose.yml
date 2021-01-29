@@ -10,12 +10,12 @@ mongoclient:
     - "3000:3000"
   links:
     - mongo
-nginx:
-  image: nginx
-  volumes:
-    - ./ui/static:/usr/share/nginx/html
-    - ./etc/nginx/:/etc/nginx
-  ports:
-    - "80:80"
-    - "443:443"
+#nginx:
+#  image: nginx
+#  volumes:
+#    - ./ui/static:/usr/share/nginx/html
+#    - ./etc/nginx/:/etc/nginx
+#  ports:
+#    - "80:80"
+#    - "443:443"
 
