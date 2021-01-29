@@ -8,3 +8,8 @@ SYMBOL = 'Symbol'
 DATE = 'Date'
 
 CSV_ROW = [SYMBOL, DATE, HIGH, LOW, OPEN, CLOSE, ADJ_CLOSE, VOLUME]
+
+
+class Symbol(object):
+    def __init__(self, ticker):
+        self.ticker = ticker

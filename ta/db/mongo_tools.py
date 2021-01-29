@@ -1,7 +1,9 @@
+import json
+
 from pymongo import MongoClient
 
 from conf import MONGO
-from ta.mdl import DATE
+from ta.mdl import DATE, Symbol
 
 
 def insert(collection, df):
@@ -36,12 +38,15 @@ def get_symbols():
         return [x for x in col.find()]
 
 
-def add_symbol(ticker):
+def add_symbol(symbol):
     with MongoClient(*MONGO) as mc:
         db = mc.get_database('admin')
         col = db.get_collection('symbols')
         col.ensure_index('ticker')
-        col.insert(ticker)
+        if type(symbol) is Symbol:
+            col.insert(symbol.__dict__)
+        elif type(symbol) is dict:
+            col.insert(symbol)
         return col
 
 
