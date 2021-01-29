@@ -24,4 +24,4 @@ class MongoTimeSeriesSource(DataFrameDataSet):
 class MongoWriter(Writer):
 
     def write(self, data_frame):
-        pprint(data_frame.to_dict())
+        pprint(data_frame.to_dict('index'))

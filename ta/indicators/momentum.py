@@ -1,4 +1,5 @@
 from ta.indicators import Indicator, talib, Series
+from ta.mdl.workflows import WorkflowContext
 
 
 class DX(Indicator):
@@ -14,7 +15,7 @@ class DX(Indicator):
         return cls(kwargs['id'], kwargs['low_data_id'], kwargs['high_data_id'], kwargs['close_data_id'],
                    kwargs['period'])
 
-    def calc(self, context):
+    def calc(self, context: WorkflowContext) -> Series:
         low_series = context.get_data(self.low_data_id)
         high_series = context.get_data(self.high_data_id)
         close_series = context.get_data(self.close_data_id)

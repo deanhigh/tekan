@@ -48,6 +48,14 @@ indicators:
     high_data_id: SYM.HIGH
     low_data_id: SYM.LOW
     period: 20
+# Patterns
+  - id: SYM.DOJI
+    class: ta.indicators.Doji
+    close_data_id: SYM.CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
+    open_data_id: SYM.OPEN
+    period: 20
 sources:
   - id: SYM.LOADER
     class: ta.data_management.file_ds.FileSource
@@ -57,3 +65,4 @@ sources:
       'Open': SYM.OPEN
       'High': SYM.HIGH
       'Low': SYM.LOW
+      'Close': SYM.CLOSE
