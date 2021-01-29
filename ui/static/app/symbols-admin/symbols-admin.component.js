@@ -31,7 +31,6 @@ angular.module('symbolsAdmin').component('symbolsAdmin', {
 
         this.viewTimeSeries = function(ticker) {
             timeSeriesConfig.set(ticker);
-            //$location.path("#!/time-series/");
         };
 
         $scope.selectedTicker = null;

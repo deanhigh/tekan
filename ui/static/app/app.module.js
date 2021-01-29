@@ -16,3 +16,17 @@ angular.module('techAnalysisApplication').factory('timeSeriesConfig', function()
         get: get
     }
 });
+
+angular.module('techAnalysisApplication').factory('selectedWorkflow', function() {
+    var selected = {};
+    function set(data) {
+        selected = data;
+    }
+    function get() {
+        return selected;
+    }
+    return {
+        set: set,
+        get: get
+    }
+});
