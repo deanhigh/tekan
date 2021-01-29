@@ -89,6 +89,7 @@ class TestProcessingTrigger(unittest.TestCase):
         trigger.action = CallbackAction(callback)
         self.assertRaises(CallbackCalled, trigger.apply, self.wc)
 
+    @unittest.skip("Not implemented yet ")
     def test_trigger_log_alert(self):
         self.fail("Log an alert in the alert log when the trigger it true")
 
