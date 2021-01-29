@@ -3,6 +3,7 @@ import unittest
 
 import numpy as np
 
+from conf import get_full_data_path
 from ta.data_management.file_ds import FileSource
 from ta.indicators import *
 from ta.mdl import Trigger, CallbackAction
@@ -20,7 +21,7 @@ class TestWorkflowLoading(unittest.TestCase):
         wfl = self.wfl
         self.assertIsInstance(wfl.sources['SYM.LOADER'], FileSource)
         self.assertEqual(wfl.sources['SYM.LOADER'].id, 'SYM.LOADER')
-        self.assertEqual(wfl.sources['SYM.LOADER'].filename, 'test_data_frame.csv')
+        self.assertEqual(wfl.sources['SYM.LOADER'].filename, 'tests/test_data_frame.csv')
 
     def test_load_indicator(self):
         wfl = self.wfl
@@ -55,7 +56,7 @@ class TestWorkflowContext(unittest.TestCase):
 class TestWorkflowContextIndicatorDependencies(unittest.TestCase):
     """ Tests that dependent data sources are loaded or calculated """
     def setUp(self):
-        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
+        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml(get_full_data_path('tests/simple_workflow.yml')))
 
     def test_dependencies(self):
         self.assertEqual(104, len(self.wc.get_data('SYM.ADJ_CLOSE')))
@@ -66,7 +67,7 @@ class TestWorkflowContextIndicatorDependencies(unittest.TestCase):
 class TestJoinedData(unittest.TestCase):
     """ Tests calculating indicators off of other indicators """
     def setUp(self):
-        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
+        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml(get_full_data_path('tests/simple_workflow.yml')))
 
     def test_ema_of_sma(self):
         self.assertEqual(104, len(self.wc.get_data('SYM.EMA20_OF_MA20')))
@@ -79,7 +80,7 @@ class TestJoinedData(unittest.TestCase):
 class TestProcessingTrigger(unittest.TestCase):
     """ Tests calculating indicators off of other indicators """
     def setUp(self):
-        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
+        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml(get_full_data_path('tests/simple_workflow.yml')))
 
     def test_trigger(self):
         def callback(context):

@@ -1,6 +1,7 @@
 import pandas
 from pandas import DataFrame, read_csv
 
+from conf import get_full_data_path
 from ta.mdl import DataFrameDataSet, ExportableDataFrameDataSet
 
 
@@ -17,6 +18,6 @@ class FileSource(DataFrameDataSet, ExportableDataFrameDataSet):
 
     def load(self):
         if self.fields:
-            self.data_frame = read_csv(self.filename, index_col=0, parse_dates=True).rename(columns=self.fields)
+            self.data_frame = read_csv(get_full_data_path(self.filename), index_col=0, parse_dates=True).rename(columns=self.fields)
         else:
-            self.data_frame = read_csv(self.filename, index_col=0, parse_dates=True)
+            self.data_frame = read_csv(get_full_data_path(self.filename), index_col=0, parse_dates=True)

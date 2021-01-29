@@ -3,6 +3,7 @@ import unittest
 
 from ddt import ddt, unpack, data
 
+from conf import get_full_data_path
 from ta.indicators import *
 from ta.mdl.workflows import WorkflowContext, WorkflowLoader
 
@@ -26,7 +27,7 @@ basic_test_data = [
 @ddt
 class TestIndicators(unittest.TestCase):
     def setUp(self):
-        self.wfl = WorkflowLoader.from_yaml('all_indicators_test.yml')
+        self.wfl = WorkflowLoader.from_yaml(get_full_data_path('tests/all_indicators_test.yml'))
         self.wc = WorkflowContext.load(self.wfl)
 
     @unpack
