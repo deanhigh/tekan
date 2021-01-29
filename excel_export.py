@@ -4,7 +4,7 @@ import os
 
 import pandas as pd
 from conf import get_symbols
-from kpi import MongoTickerSource
+from kpi import MongoTickerSource, get_all_indicators_df
 
 from logging import warning, info
 
@@ -28,12 +28,12 @@ def export_underlying(symbol, output_directory, output_filename=None):
         else:
             warning("%s does not exist in mongodb", symbol)
 
-
 def export_symbols_in_file(symbols_file, output_dir):
     for s in get_symbols(symbols_file):
         export_underlying(s, output_dir)
 
 if __name__ == '__main__':
+
     logging.basicConfig(level=logging.INFO)
 
     argsp = argparse.ArgumentParser('Symbol exporter')
@@ -46,6 +46,7 @@ if __name__ == '__main__':
     if args.symbols_file:
         export_symbols_in_file(args.symbols_file, args.out_dir)
     elif args.symbol:
-        export_underlying(args.symbol, args.out_dir)
+        export_dataframe(get_all_indicators_df(args.symbol), "{}.xlsx".format(args.symbol), 'All Data')
+        #export_underlying(args.symbol, args.out_dir)
     else:
         argsp.print_help()

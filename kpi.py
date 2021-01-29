@@ -1,8 +1,12 @@
+from functools import partial
+
+import math
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from conf import MONGO
 from mdl import DATE, ADJ_CLOSE, HIGH, LOW, CLOSE, VOLUME, OPEN
-from numpy.core.numeric import ndarray
+from numpy.core.numeric import ndarray, NaN, nan
 from pymongo import MongoClient
 
 MONGO_DATABASE_NAME = 'quotes'
@@ -84,9 +88,9 @@ class TR(Measure):
     def _tr(self, vals):
         prev_close = vals[CLOSE + '_prev']
         m1 = (vals[HIGH] - vals[LOW])
-        m2 = abs(vals[HIGH] - prev_close) if prev_close else -1
-        m3 = abs(vals[LOW] - prev_close) if prev_close else -1
-        tr = max(m1, m2, m3)
+        m2 = abs(vals[HIGH] - prev_close)
+        m3 = abs(vals[LOW] - prev_close)
+        tr = max(m1, m2, m3) if not math.isnan(prev_close) else None
         return tr
 
     def tr(self):
@@ -94,26 +98,135 @@ class TR(Measure):
             join(self.ticker_source.underlying_field_df(LOW)). \
             join(self.ticker_source.underlying_field_df(CLOSE)). \
             join(self.ticker_source.underlying_field_df(CLOSE).shift(), rsuffix='_prev')
-        tr = data.apply(self._tr, axis=1)
-        print(tr)
+        tr = data.apply(self._tr, axis=1).to_frame(name='TR')
         return tr
+
+
+class Smoothing(object):
+    def __init__(self):
+        self.previous = None
+
+    @classmethod
+    def smoothing(cls, period):
+        return partial(cls()._smoothing, period)
+
+    def _smoothing(self, period, values):
+        smoothed = (self.previous * (period - 1) + values[-1]) / period if self.previous else sum(values) / period
+        self.previous = smoothed
+        return self.previous
+
+    @classmethod
+    def first_smoothing(cls, period):
+        return partial(cls()._first_smoothing, period)
+
+    def _first_smoothing(self, period, vals):
+        smoothed = self.previous - (self.previous / period) + vals[-1] if self.previous else sum(vals)
+        self.previous = smoothed
+        return smoothed
 
 
 class ATR(TR):
     def atr(self, period=14):
-        atr = self.tr().rolling(period).mean()
-        print(atr)
+        atr = self.tr().rolling(period).apply(Smoothing.smoothing(period)).rename(
+            columns={'TR': 'ATR{}'.format(period)})
         return atr
 
 
-def plot_samples():
-    with MongoTickerSource('ADBE') as ts:
-        df = ts.underlying_field_df().join(ts.underlying_field_df(HIGH)).join(ts.underlying_field_df(LOW)).join(
-            ts.underlying_field_df(ADJ_CLOSE)). \
-            join(TR.create(ts).tr()).join(ATR.atr())
-        df.to_csv('ADBE')
+class DM(Measure):
+    def _dmp(self, v):
+        prev_low = v[LOW + '_prev']
+        prev_high = v[HIGH + '_prev']
+        if not math.isnan(prev_low) and not math.isnan(prev_high):
+            h = v[HIGH] - prev_high
+            l = prev_low - v[LOW]
+            return h if h > l and h > 0 else 0
+        else:
+            return None
 
+    def _dmn(self, v):
+        prev_low = v[LOW + '_prev']
+        prev_high = v[HIGH + '_prev']
+        if not math.isnan(prev_low) and not math.isnan(prev_high):
+            l = prev_low - v[LOW]
+            h = v[HIGH] - prev_high
+            return l if l > h and l > 0 else 0
+        else:
+            return None
+
+    def _combine_data(self):
+        return self.ticker_source.underlying_field_df(HIGH). \
+            join(self.ticker_source.underlying_field_df(LOW)). \
+            join(self.ticker_source.underlying_field_df(HIGH).shift(), rsuffix='_prev'). \
+            join(self.ticker_source.underlying_field_df(LOW).shift(), rsuffix='_prev')
+
+    def dm(self):
+        data = self._combine_data()
+
+        return data.apply(self._dmp, axis=1).to_frame(name='+DM') \
+            .join(data.apply(self._dmn, axis=1).to_frame(name='-DM'))
+
+
+class SmootherDM(Measure):
+    def __init__(self):
+        self.previous = None
+
+    def smoothed_dm(self, period=14):
+        dm = DM.create(self.ticker_source).dm()
+        smtr = TR.create(self.ticker_source).tr().rolling(period).apply(Smoothing.first_smoothing(period)).rename(
+            columns={'TR': 'TR{}'.format(period)})
+        pdm = dm['+DM'].rolling(period).apply(Smoothing.first_smoothing(period)).to_frame('+DM{}'.format(period))
+        ndm = dm['-DM'].rolling(period).apply(Smoothing.first_smoothing(period)).to_frame('-DM{}'.format(period))
+        return smtr.join(pdm).join(ndm)
+
+
+class DI(Measure):
+    def _dip(self, period, v):
+        return 100 * (v['+DM{}'.format(period)] / v['TR{}'.format(period)])
+
+    def _din(self, period, v):
+        return 100 * (v['-DM{}'.format(period)] / v['TR{}'.format(period)])
+
+    def di(self, period=14):
+        sdm = SmootherDM.create(self.ticker_source).smoothed_dm(period)
+        return sdm.apply(partial(self._dip, period), axis=1).to_frame(name='+DI{}'.format(period)).join(
+            sdm.apply(partial(self._din, period), axis=1).to_frame(name='-DI{}'.format(period)))
+
+
+class ADX(Measure):
+    def _didiff(self, period, v):
+        return abs(v['+DI{}'.format(period)] - v['-DI{}'.format(period)])
+
+    def _disum(self, period, v):
+        return v['+DI{}'.format(period)] + v['-DI{}'.format(period)]
+
+    def _dx(self, v):
+        return 100 * (v['DIFF'] / v['SUM'])
+
+    def adx(self, period=14):
+        di = DI.create(self.ticker_source).di(period)
+        prep = di.apply(partial(self._didiff, period), axis=1).to_frame(name='DIFF').join(
+            di.apply(partial(self._disum, period), axis=1).to_frame(name='SUM'))
+        dx = prep.apply(self._dx, axis=1).to_frame(name='DX')
+        return dx.join(dx.rolling(period).apply(Smoothing.smoothing(period)).rename(columns={'DX': 'ADX{}'.format(period)}))
+
+
+def get_all_indicators_df(symbol):
+    with MongoTickerSource(symbol) as ts:
+        df = ts.underlying_df()
+        # df = df.join(TR.create(ts).tr())
+        # df = df.join(ATR.create(ts).atr())
+        # df = df.join(SmootherDM.create(ts).smoothed_dm())
+        df = df.join(ADX.create(ts).adx())
+        return df
+
+
+#
+# def plot_samples():
+#     with MongoTickerSource('ADBE') as ts:
+#         df = ts.underlying_field_df().join(ts.underlying_field_df(HIGH)).join(ts.underlying_field_df(LOW)).join(
+#             ts.underlying_field_df(ADJ_CLOSE)). \
+#             join(TR.create(ts).tr()).join(ATR.atr())
+#         df.to_csv('ADBE')
 
 if __name__ == '__main__':
     plt.style.use('dark_background')
-    plot_samples()

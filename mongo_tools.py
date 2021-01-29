@@ -25,4 +25,3 @@ def dataframe_to_mongo(df, symbol, overwrite=False):
         db = mc.get_database('quotes')
         col = get_collection(db, symbol, overwrite)
         insert(col, df)
-
