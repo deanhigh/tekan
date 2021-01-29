@@ -4,6 +4,7 @@ import unittest
 import numpy as np
 
 from ta.data_management.file_ds import FileSource
+from ta.indicators import SMA
 from ta.indicators.kpi import *
 from ta.mdl.workflows import WorkflowContext, WorkflowLoader
 

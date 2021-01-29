@@ -18,40 +18,6 @@ class Indicator(object):
         return self.id
 
 
-class MovingAverage(Indicator):
-    def __init__(self, id, input_data_id, period):
-        self.input_data_id = input_data_id
-        self.period = period
-        super(MovingAverage, self).__init__(id)
-
-    @classmethod
-    def from_descriptor(cls, **kwargs):
-        return cls(kwargs['id'], kwargs['input_data_id'], kwargs['period'])
-
-
-class SMA(MovingAverage):
-    """ Simple moving average on a field of choice"""
-
-    def calc(self, context):
-        source_series = context.get_data(self.input_data_id)
-        return Series(data=talib.SMA(source_series.values, self.period), index=source_series.index.values)
-
-
-class EMA(MovingAverage):
-    """ Exponentially weighted moving average """
-
-    def calc(self, context):
-        source_series = context.get_data(self.input_data_id)
-        return Series(data=talib.EMA(source_series.values, self.period), index=source_series.index.values)
-
-#
-# class STDDEV(Indicator):
-#     """Standard deviation of a field"""
-#
-#     def calc(self, period=20, field=ADJ_CLOSE):
-#         return self.data_set.underlying_field_df(field).rolling(period).std().rename(
-#             columns={field: 'STDDEV{}'.format(period)})
-#
 #
 # class TR(Indicator):
 #     """ True range """

@@ -1,6 +1,7 @@
 import logging
 from sources import MongoTickerSource
 
+logging.basicConfig(level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler())
 
 

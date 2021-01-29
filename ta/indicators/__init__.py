@@ -1,4 +1,5 @@
 from ta.mdl import DataSet
+from ta.indicators.ma import *
 
 
 class IndicatorDataSetWrapper(DataSet):
