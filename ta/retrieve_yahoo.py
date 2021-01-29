@@ -5,13 +5,13 @@ import yaml
 
 from ta.connectors.yahoo import YahooDataSource
 from ta.data_management.file_ds import FileSource
-from ta.mdl import DataSet
 
 
 def get_symbols(symbol_file):
     with open(symbol_file) as f:
         yml = yaml.load(f)
-        return [DataSet(s) for s in yml['symbols']]
+        return [YahooDataSource(s) for s in yml['symbols']]
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
@@ -22,10 +22,10 @@ if __name__ == '__main__':
     argsp.add_argument('-o', action='store', dest='output_file', default='output.csv', help='Output file')
     args = argsp.parse_args()
 
-    ds = FileSource(args.output_file)
+    ds = FileSource('LOCAL', args.output_file)
     if args.symbols_file:
-        for s in get_symbols(args.symbols_file):
-            YahooDataSource.load(args.symbol).save(ds)
+        for yds in get_symbols(args.symbols_file):
+            yds.load().save(ds)
     elif args.symbol:
         YahooDataSource.load(args.symbol).save(ds)
     else:

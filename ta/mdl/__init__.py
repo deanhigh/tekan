@@ -1,13 +1,10 @@
-from logging import info
-
-
 class DataSet(object):
     def __init__(self, id):
         self.id = id
         self.__data_frame = None
 
     def __get_data_frame(self):
-        if self.__data_frame is None and hasattr(self,'load'):
+        if self.__data_frame is None and hasattr(self, 'load'):
             self.load()
         return self.__data_frame
 
@@ -38,8 +35,8 @@ class Series(object):
 
     data = property(__get_data)
 
-class Predicate(object):
 
+
+class Predicate(object):
     def apply(self):
         pass
-
