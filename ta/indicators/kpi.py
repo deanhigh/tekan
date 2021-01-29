@@ -4,18 +4,6 @@ from pandas import Series
 from ta.mdl import IndicatorSeriesPointer
 
 
-class Indicator(object):
-    def __init__(self, id):
-        self.id = id if id else str(self)
-
-    def calc(self, context):
-        raise NotImplementedError('{} has not implemented calc method'.format(self))
-
-    def output_pointers(self):
-        return {self.id: IndicatorSeriesPointer(self, self.id)}
-
-    def __str__(self):
-        return self.id
 
 
 #

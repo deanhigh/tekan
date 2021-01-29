@@ -1,7 +1,7 @@
 import talib
 from pandas import Series
 
-from ta.indicators.kpi import Indicator
+from ta.indicators.base import Indicator
 
 
 class MovingAverage(Indicator):
