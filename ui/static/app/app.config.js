@@ -12,6 +12,9 @@ config(['$locationProvider', '$routeProvider',
         when('/symbols', {
             template: '<symbols-admin></symbols-admin>'
         }).
+        when('/workflows', {
+            template: '<workflows></workflows>'
+        }).
         otherwise('/symbols');
     }
 ]);
