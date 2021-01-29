@@ -43,8 +43,6 @@ angular.module('symbolsAdmin').component('symbolsAdmin', {
         };
 
         this.syncAll = function() {
-            // var service = $resource('/api/admin/symbols-sync');
-            // service.post();
             $scope.sync = SymbolSync();
             SymbolSync.save($scope.sync);
         };

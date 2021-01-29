@@ -1,3 +1,4 @@
+import logging
 from logging import info
 
 from pandas_datareader import data
@@ -14,7 +15,11 @@ def fetch_symbol_data(symbol):
 
 def fetch_all_symbols_data():
     for symbol in get_symbols():
-        fetch_symbol_data(symbol)
+        try:
+            fetch_symbol_data(symbol)
+        except Exception as e:
+            logging.exception("Handled exception from yahoo while fetching %s" % symbol, e)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     fetch_all_symbols_data()
