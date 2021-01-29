@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('timeSeries', []);
+angular.module('timeSeries', ['ngResource']);

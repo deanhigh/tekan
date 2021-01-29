@@ -15,7 +15,9 @@
     "ag-grid": "^6.0.1",
     "angular-resource": "^1.5.8",
     "angular-route": "^1.5.8",
-    "angular": "^1.5.8"
+    "angular": "^1.5.8",
+    "dygraphs": "^1.1.1",
+    "d3": "^4.2.7"
   },
   "ignore": []
 }
