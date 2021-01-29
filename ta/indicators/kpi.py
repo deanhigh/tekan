@@ -1,7 +1,7 @@
 import talib
 from pandas import Series
 
-from ta.mdl import SeriesPointer
+from ta.mdl import IndicatorSeriesPointer
 
 
 class Indicator(object):
@@ -12,7 +12,7 @@ class Indicator(object):
         raise NotImplementedError('{} has not implemented calc method'.format(self))
 
     def output_pointers(self):
-        return {self.id: SeriesPointer(self, self.id)}
+        return {self.id: IndicatorSeriesPointer(self, self.id)}
 
     def __str__(self):
         return self.id

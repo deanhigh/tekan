@@ -1,4 +1,5 @@
 from ta.mdl import Predicate
+from ta.mdl.workflows import WorkflowContext
 
 
 class CrossOver(Predicate):

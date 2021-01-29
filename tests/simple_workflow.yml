@@ -3,6 +3,14 @@ indicators:
     class: ta.indicators.kpi.SMA
     period: 20
     input_data_id: SYM.ADJ_CLOSE
+  - id: SYM.EMA20
+    class: ta.indicators.kpi.EMA
+    period: 20
+    input_data_id: SYM.ADJ_CLOSE
+  - id: SYM.EMA20_OF_MA20
+    class: ta.indicators.kpi.EMA
+    period: 20
+    input_data_id: SYM.MA20
 sources:
   - id: SYM.LOADER
     class: ta.data_management.file_ds.FileSource

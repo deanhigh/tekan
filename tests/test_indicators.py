@@ -1,6 +1,7 @@
 import os
 import unittest
 
+import logging
 import numpy as np
 from pandas import Series
 
@@ -12,6 +13,8 @@ from ta.mdl import DataSet
 from ta.mdl.workflows import WorkflowContext, WorkflowLoader
 
 SYM_ADJ_CLOSE = 'SYM.ADJ_CLOSE'
+
+logging.basicConfig(level=logging.INFO)
 
 
 class TestIndicatorsHappyPath(unittest.TestCase):
@@ -30,7 +33,7 @@ class TestIndicatorsHappyPath(unittest.TestCase):
         self.assertListEqual([np.isnan(x) for x in result[0:19]], [True] * 19)
         #  And the next 1872 should be False
         self.assertListEqual([np.isnan(x) for x in result[20:]], [False] * 84)
-        self.assertEqual(result['2016-12-28'], 95)
+        self.assertEqual(result['2016-12-28'], 2270.1749999999997 )
 
     def test_ema(self):
         ema = EMA('EMA20', SYM_ADJ_CLOSE, 20)
@@ -41,19 +44,9 @@ class TestIndicatorsHappyPath(unittest.TestCase):
         self.assertListEqual([np.isnan(x) for x in result[0:19]], [True] * 19)
         #  And the next 1872 should be False
         self.assertListEqual([np.isnan(x) for x in result[20:]], [False] * 84)
-        self.assertEqual(result['2016-12-28'], 95)
+        self.assertEqual(result['2016-12-28'], 2286.7962876973415)
 
 
-class TestJoinedIndicators(unittest.TestCase):
-    def setUp(self):
-        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
-
-    def test_sma_ema(self):
-        sma = SMA('SMA20', SYM_ADJ_CLOSE, 20)
-        ema = EMA('EMA20', 'SMA20', 20)
-        result = ema.calc(self.wc)
-        self.assertEqual(len(result.data_frame['EMA20']), 104)
-        self.assertEqual(len(result.data_frame['MA20']), 104)
 
 
 if __name__ == '__main__':

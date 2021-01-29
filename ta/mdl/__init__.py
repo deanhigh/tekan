@@ -53,12 +53,19 @@ class SeriesPointer(object):
         self.data_set = data_set
         self.series = series
 
-    def __get_data(self):
+    def get_data(self, wc=None):
         return self.data_set.data_frame[self.series]
 
-    data = property(__get_data)
+    data = property(get_data)
 
 
+class IndicatorSeriesPointer(object):
+    def __init__(self, indicator, series):
+        self.indicator = indicator
+        self.series = series
+
+    def get_data(self, wc):
+        return self.indicator.calc(wc)
 
 class Predicate(object):
     def apply(self):

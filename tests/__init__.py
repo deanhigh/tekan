@@ -1,4 +1,7 @@
+import logging
 from sources import MongoTickerSource
+
+logging.getLogger().addHandler(logging.StreamHandler())
 
 
 class TestTickerSource(MongoTickerSource):

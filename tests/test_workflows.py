@@ -1,51 +1,13 @@
 import os
 import unittest
 
-from pandas import DataFrame
+import numpy as np
 
 from ta.data_management.file_ds import FileSource
-from ta.db import ADJ_CLOSE, VOLUME, CLOSE, HIGH, LOW, OPEN
-from ta.mdl.workflows import WorkflowContext, DuplicateTimeSeries, WorkflowLoader
 from ta.indicators.kpi import *
-
-
-# class TestWorkflowContextOperations(unittest.TestCase):
-#     def setUp(self):
-#         self.ds = FileSource("TEST", os.path.join(os.path.dirname(__file__), "./test_data_frame.csv"))
-#
-#     def test_add_series(self):
-#         wc = WorkflowContext()
-#         wc.add_ts_data(self.ds.data_frame[ADJ_CLOSE])
-#         self.assertSetEqual(wc.ts_ids, {ADJ_CLOSE})
-#
-#     def test_add_data_frame(self):
-#         wc = WorkflowContext()
-#         wc.add_ts_data(self.ds.data_frame)
-#         self.assertSetEqual(wc.ts_ids, {VOLUME, OPEN, LOW, HIGH, CLOSE, ADJ_CLOSE})
-#
-#     def test_fail_on_dupe(self):
-#         wc = WorkflowContext()
-#         wc.add_ts_data(self.ds.data_frame[ADJ_CLOSE])
-#         try:
-#             wc.add_ts_data(self.ds.data_frame[ADJ_CLOSE])
-#         except DuplicateTimeSeries as e:
-#             self.assertSetEqual(wc.ts_ids, {ADJ_CLOSE})
-#             self.assertSetEqual({ADJ_CLOSE}, e.duplicate_columns)
-#
-#     def test_fail_on_dupe_dataframe(self):
-#         wc = WorkflowContext()
-#         wc.add_ts_data(self.ds.data_frame)
-#         try:
-#             new_df = DataFrame()
-#             new_df += self.ds.data_frame[ADJ_CLOSE]
-#             new_df += self.ds.data_frame[OPEN]
-#         except DuplicateTimeSeries as e:
-#             self.assertSetEqual(wc.ts_ids, {VOLUME, OPEN, LOW, HIGH, CLOSE, ADJ_CLOSE})
-#             self.assertSetEqual({ADJ_CLOSE, OPEN}, e.duplicate_columns)
-
+from ta.mdl.workflows import WorkflowContext, WorkflowLoader
 
 class TestWorkflowLoader(unittest.TestCase):
-
     def setUp(self):
         self.wfl = WorkflowLoader.from_yaml(os.path.join(os.path.dirname(__file__), "./simple_workflow.yml"))
 
@@ -61,14 +23,54 @@ class TestWorkflowLoader(unittest.TestCase):
         self.assertEqual(wfl.indicators['SYM.MA20'].input_data_id, 'SYM.ADJ_CLOSE')
 
     def test_get_data_sets(self):
-        self.assertSetEqual(set(self.wfl.get_datasets().keys()), {'SYM.OPEN', 'SYM.ADJ_CLOSE', 'SYM.MA20'})
+        self.assertSetEqual(set(self.wfl.get_data_pointers().keys()),
+                            {'SYM.OPEN', 'SYM.ADJ_CLOSE', 'SYM.MA20', 'SYM.EMA20', 'SYM.EMA20_OF_MA20'})
 
 
 class TestWorkflowContext(unittest.TestCase):
-
     def test_load_context(self):
-        wc = WorkflowContext.load(WorkflowLoader.from_yaml(os.path.join(os.path.dirname(__file__), "./simple_workflow.yml")))
-        self.assertSetEqual(set(wc.datasets.keys()), {'SYM.OPEN', 'SYM.ADJ_CLOSE', 'SYM.MA20'})
+        wc = WorkflowContext.load(
+            WorkflowLoader.from_yaml(os.path.join(os.path.dirname(__file__), "./simple_workflow.yml")))
+        self.assertSetEqual(set(wc.datasets.keys()),
+                            {'SYM.OPEN', 'SYM.ADJ_CLOSE', 'SYM.MA20', 'SYM.EMA20_OF_MA20', 'SYM.EMA20'})
+
+
+class TestWorkflowContextIndicatorDependencies(unittest.TestCase):
+    def setUp(self):
+        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
+
+    def test_dependencies(self):
+        self.assertEqual(104, len(self.wc.get_data('SYM.ADJ_CLOSE')))
+        self.assertEqual(104, len(self.wc.get_data('SYM.OPEN')))
+        self.assertEqual(104, len(self.wc.get_data('SYM.MA20')))
+
+
+class TestJoinedData(unittest.TestCase):
+    def setUp(self):
+        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
+
+    def test_ema_of_sma(self):
+        self.assertEqual(104, len(self.wc.get_data('SYM.EMA20_OF_MA20')))
+        self.assertEqual(1865.9251405475791, self.wc.get_data('SYM.EMA20_OF_MA20')['2016-12-28'])
+        self.assertEqual(1823.3725237631138, self.wc.get_data('SYM.EMA20_OF_MA20')['2016-12-27'])
+        self.assertListEqual([np.isnan(x) for x in self.wc.get_data('SYM.EMA20_OF_MA20')[0:38]], [True] * 38)
+        self.assertListEqual([np.isnan(x) for x in self.wc.get_data('SYM.EMA20_OF_MA20')[39:]], [False] * 65)
+
+
+class TestIndicatorsFromContextLoad(unittest.TestCase):
+    def setUp(self):
+        self.wc = WorkflowContext.load(WorkflowLoader.from_yaml('simple_workflow.yml'))
+
+    def test_sma(self):
+        self.assertEqual(104, len(self.wc.get_data('SYM.MA20')))
+        self.assertEqual(2270.1749999999997, self.wc.get_data('SYM.MA20')['2016-12-28'])
+        self.assertEqual(2222.8749999999995, self.wc.get_data('SYM.MA20')['2016-12-27'])
+
+    def test_ema(self):
+        self.assertEqual(104, len(self.wc.get_data('SYM.EMA20')))
+        self.assertEqual(2286.7962876973415, self.wc.get_data('SYM.EMA20')['2016-12-28'])
+        self.assertEqual(2239.4958969286408, self.wc.get_data('SYM.EMA20')['2016-12-27'])
+
 
 if __name__ == '__main__':
     unittest.main()

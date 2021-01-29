@@ -1,6 +1,9 @@
+import logging
+from pprint import pformat
+
 import yaml
 
-
+logger = logging.getLogger("workflows")
 
 class WorkflowLoader(object):
     def __init__(self, sources, indicators):
@@ -23,16 +26,17 @@ class WorkflowLoader(object):
 
     @classmethod
     def from_dict(cls, desc):
-        ret = cls({x['id']:cls.load_wf_entry(x) for x in desc['sources']},
-                  {x['id']:cls.load_wf_entry(x) for x in desc['indicators']})
+        ret = cls({x['id']: cls.load_wf_entry(x) for x in desc['sources']},
+                  {x['id']: cls.load_wf_entry(x) for x in desc['indicators']})
         return ret
 
-    def get_datasets(self):
+    def get_data_pointers(self):
         ret = dict()
         for i in self.sources.values():
             ret.update(i.series_pointers())
         for i in self.indicators.values():
             ret.update(i.output_pointers())
+        logger.info("%s", pformat(ret))
         return ret
 
 
@@ -40,21 +44,19 @@ class WorkflowContext(object):
     """
     The workflow context contains and manages the current running set of data.
     """
+
     def __init__(self):
         self.__data_sets = dict()
-        self.__ = dict()
 
     @classmethod
     def load(cls, loader):
         wc = cls()
-        wc.datasets.update(loader.get_datasets())
+        wc.__data_sets.update(loader.get_data_pointers())
+
         return wc
 
     def add_dataset(self, dataset):
         self.datasets[dataset.id] = dataset
-
-    def add_indicator(self, indicator):
-        self.indicator[indicator.id] = indicator
 
     def get_or_create_dataset(self, dataset_id, create_func=None):
         """
@@ -68,12 +70,11 @@ class WorkflowContext(object):
         """
         Gets the identified dataset if it is found. If its not found it will attempt to create using create func.
         """
-        return self.datasets[data_id].data
+        return self.datasets[data_id].get_data(self)
 
     @property
     def datasets(self):
         return self.__data_sets
-
 
 
 class DuplicateTimeSeries(Exception):
