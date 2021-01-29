@@ -1,4 +1,7 @@
+import json
 import logging
+
+from ta.utils.yaml import YamlLoader
 
 log = logging.getLogger('workflows')
 
@@ -25,17 +28,14 @@ def load_workflow_entry(entry, default_cls=None):
         raise e
 
 
-class WorkflowLoader(object):
+
+
+class WorkflowLoader(YamlLoader):
     def __init__(self, sources, indicators, triggers, functions):
         self.sources = sources
         self.indicators = indicators
         self.triggers = triggers
         self.functions = functions
-
-    @classmethod
-    def from_yaml(cls, yaml_file):
-        with open(yaml_file, 'r') as f:
-            return WorkflowLoader.from_dict(yaml.load(f))
 
     @classmethod
     def from_dict(cls, desc):

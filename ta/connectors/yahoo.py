@@ -25,3 +25,6 @@ class YahooDataSource(DataFrameDataSet):
 
         else:
             self.data_frame = data.DataReader(self.id, 'yahoo', self.range_start, self.range_end)
+
+    def __str__(self):
+        return self.id

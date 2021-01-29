@@ -7,14 +7,12 @@ import yaml
 from conf import TS_RANGE
 from ta.connectors.yahoo import YahooDataSource
 from ta.data_management.file_ds import CsvFileWriter
+from ta.data_management.symbols import SymbolsList
 
 log = logging.getLogger(__name__)
 
 
-def get_symbols(symbol_file):
-    with open(symbol_file) as f:
-        yml = yaml.load(f)
-        return [YahooDataSource(s, *TS_RANGE) for s in yml['symbols']]
+
 
 
 if __name__ == '__main__':
@@ -28,7 +26,7 @@ if __name__ == '__main__':
     args = argsp.parse_args()
 
     if args.symbols_file:
-        for yds in get_symbols(args.symbols_file):
+        for yds in SymbolsList.from_yaml(args.symbols_file):
             try:
                 yds.load()
                 yds.save(CsvFileWriter(os.path.join(args.output_dir, '%s.csv' % yds.id)))

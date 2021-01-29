@@ -37,6 +37,7 @@ class SymbolsSync(Resource):
 
 
 class TimeSeries(Resource):
+
     def get(self, ticker=None):
         return get_time_series(ticker).to_csv()
 
@@ -55,10 +56,12 @@ class Workflows(Resource):
         delete_workflow(request.args['name'])
         return self.get()
 
+
 api.add_resource(SymbolsAdmin, '/api/admin/symbols', '/api/admin/symbols/<string:ticker>')
 api.add_resource(SymbolsSync, '/api/admin/symbols-sync', '/api/admin/symbols-sync/<string:ticker>')
 api.add_resource(TimeSeries, '/api/time-series', '/api/time-series/<string:ticker>')
 api.add_resource(Workflows, '/api/admin/workflows', '/api/admin/workflows/<string:name>')
+
 
 if __name__ == "__main__":
 

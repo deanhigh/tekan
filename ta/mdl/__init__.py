@@ -55,6 +55,7 @@ class DataFrameDataSet(DataSet):
     def save(self, writer):
         return writer.write(self.data_frame)
 
+
 class Writer(object):
     def write(self, data_frame):
         raise NotImplementedError
