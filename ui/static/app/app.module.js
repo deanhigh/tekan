@@ -1,10 +1,10 @@
 'use strict';
 
 var techAnalysisApplication = angular.module('techAnalysisApplication',
-    [ 'ngRoute', 'symbolsAdmin', 'timeSeries', 'workflows', 'workflowBuilder' ]);
+    [ 'ngRoute', 'symbolsAdmin', 'timeSeries', 'workflows', 'workflowBuilder', 'alerts' ]);
 
 angular.module('techAnalysisApplication').factory('timeSeriesConfig', function() {
-    var config = {};
+    var config = null;
     function set(data) {
         config = data;
     }

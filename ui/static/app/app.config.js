@@ -13,6 +13,8 @@ angular.module('techAnalysisApplication').config(['$locationProvider', '$routePr
             template: '<workflows></workflows>'
         }).when('/workflow-builder', {
             template: '<workflow-builder></workflow-builder>'
-        }).otherwise('/symbols');
+        }).when('/alerts', {
+            template: '<alerts></alerts>'
+        }).otherwise('/alerts');
     }
 ]);

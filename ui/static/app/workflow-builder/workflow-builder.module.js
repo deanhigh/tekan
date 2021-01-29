@@ -1,3 +1,3 @@
 'use strict';
 
-angular.module('workflowBuilder', ['ngResource']);
+angular.module('workflowBuilder', ['ngResource', 'workflowMeasures', 'workflowSources', 'workflowTriggers']);

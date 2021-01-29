@@ -1,44 +1,46 @@
-<div class="row">
-    <div class="col-lg-2">
-        <form id="addSymbolForm" action="#" ng-submit="$ctrl.addSymbol()">
-            <div class="input-group">
-                <input type="text" ng-model="form.ticker" class="form-control">
-                <div class="input-group-btn">
-                    <input type="Submit" value="Add" class="btn btn-default">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2">
+            <form id="addSymbolForm" action="#" ng-submit="$ctrl.addSymbol()">
+                <div class="input-group">
+                    <input type="text" ng-model="form.ticker" class="form-control">
+                    <div class="input-group-btn">
+                        <input type="Submit" value="Add" class="btn btn-default">
+                    </div>
                 </div>
-            </div>
-        </form>
-    </div>
-    <div class="col-lg-2">
-        <form id="syncAll" action="#" ng-submit="$ctrl.syncAll()">
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <input type="Submit" value="Sync All" class="btn btn-default">
+            </form>
+        </div>
+        <div class="col-lg-2">
+            <form id="syncAll" action="#" ng-submit="$ctrl.syncAll()">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <input type="Submit" value="Sync All" class="btn btn-default">
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
 
-<table class="table table-condensed table-hover">
-    <thead>
-    <tr>
-        <th>Symbol</th>
-        <th>Last Sync</th>
-        <th>...</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="symbol in symbols">
-        <td>{{symbol.ticker}}</td>
-        <td>{{symbol.last_sync}}</td>
-        <td>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-default">Sync</button>
-                <button type="button" class="btn btn-default" ng-click="$ctrl.viewTimeSeries(symbol.ticker)">View</button>
-                <button type="button" class="btn btn-default" ng-click="$ctrl.deleteSelected(symbol.ticker)">Delete</button>
-            </div>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <table class="table table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Last Sync</th>
+            <th>...</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="symbol in symbols">
+            <td>{{symbol.ticker}}</td>
+            <td>{{symbol.last_sync}}</td>
+            <td>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default">Sync</button>
+                    <button type="button" class="btn btn-default" ng-click="$ctrl.viewTimeSeries(symbol.ticker)">View</button>
+                    <button type="button" class="btn btn-default" ng-click="$ctrl.deleteSelected(symbol.ticker)">Delete</button>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
