@@ -15,7 +15,7 @@ angular.module('symbolsAdmin').factory('SymbolSync',
 
 angular.module('symbolsAdmin').component('symbolsAdmin', {
     templateUrl: 'app/symbols-admin/symbols-admin.template.html',
-    controller: function SymbolsAdminController($scope, Symbol, SymbolSync) {
+    controller: function SymbolsAdminController($scope, Symbol, SymbolSync, timeSeriesConfig) {
         this.symbols = Symbol.query(function (data) {
             $scope.symbols = data;
         });
@@ -27,6 +27,11 @@ angular.module('symbolsAdmin').component('symbolsAdmin', {
                 $scope.form.ticker = "";
                 $scope.symbols = response
             });
+        };
+
+        this.viewTimeSeries = function(ticker) {
+            timeSeriesConfig.set(ticker);
+            //$location.path("#!/time-series/");
         };
 
         $scope.selectedTicker = null;
