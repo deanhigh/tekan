@@ -2,4 +2,4 @@ dist
 archive
 node_modules
 **/vendor/
-**/bower_components/
+**/libs/

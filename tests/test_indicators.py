@@ -2,8 +2,9 @@ import unittest
 
 import matplotlib.pyplot as plt
 from ddt import ddt, data
-from indicators.kpi import SMA, EWMA, MarketVolatilityType
 from mdl import ADJ_CLOSE
+
+from ta.indicators.kpi import SMA, EWMA, MarketVolatilityType
 from tests import TestTickerSource
 
 test_symbols = ['AAPL']

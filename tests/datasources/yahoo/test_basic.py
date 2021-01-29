@@ -1,7 +1,8 @@
 import unittest
 
-from connectors.yahoo.yfds import TickerDataRetriever
 from ddt import ddt, data
+
+from ta.connectors.yahoo import TickerDataRetriever
 
 tickers = ['PNRG', 'LIT', 'ADBE']
 

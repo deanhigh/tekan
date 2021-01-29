@@ -1,12 +1,12 @@
-'http://query.yahooapis.com/v1/public/yql'
 import argparse
 import logging
 from logging import info, exception
 
 from pandas_datareader import data
-from conf import TS_RANGE, get_symbols
-from mongo_tools import dataframe_to_mongo
 from pandas_datareader._utils import RemoteDataError
+
+from conf import TS_RANGE, get_symbols
+from ta.db import dataframe_to_mongo
 
 
 def fetch_symbol_data(symbol):
@@ -32,3 +32,4 @@ if __name__ == '__main__':
         fetch_symbol_data(args.symbol)
     else:
         argsp.print_help()
+

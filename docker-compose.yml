@@ -1,7 +1,7 @@
 mongo:
   image: mongo
   volumes:
-    - mongo_data/:/data/db
+    - ./.data/mongo/:/data/db
   ports:
     - "27017:27017"
 mongoclient:
@@ -10,3 +10,12 @@ mongoclient:
     - "3000:3000"
   links:
     - mongo
+nginx:
+  image: nginx
+  volumes:
+    - ./ui/static:/usr/share/nginx/html
+    - ./etc/nginx/:/etc/nginx
+  ports:
+    - "80:80"
+    - "443:443"
+

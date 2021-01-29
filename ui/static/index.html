@@ -1,0 +1,33 @@
+<html ng-app="techAnalysisApplication">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Technical Analysis Toolkit</title>
+    <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.css">
+    <script src="libs/jquery/dist/jquery.js"></script>
+    <script src="libs/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="libs/angular/angular.js"></script>
+    <script src="libs/angular-resource/angular-resource.js"></script>
+    <script src="app/app.module.js"></script>
+    <script src="app/symbols-admin/symbols-admin.module.js"></script>
+    <script src="app/symbols-admin/symbols-admin.component.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse bg-inverse">
+    <a class="navbar-brand" href="#">TATools</a>
+    <ul class="nav navbar-nav">
+        <li class="nav-item active">
+            <a class="nav-link" href="#">Symbols<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Admin</a>
+        </li>
+    </ul>
+</nav>
+
+<symbols-admin></symbols-admin>
+
+
+</body>
+</html>

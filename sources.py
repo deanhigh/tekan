@@ -1,8 +1,8 @@
-from conf import MONGO
-from mdl import HIGH, LOW, OPEN, CLOSE, ADJ_CLOSE, VOLUME, DATE
-from pymongo import MongoClient
 import pandas as pd
+from pymongo import MongoClient
 
+from conf import MONGO
+from ta.mdl import HIGH, LOW, OPEN, CLOSE, ADJ_CLOSE, VOLUME, DATE
 
 MONGO_DATABASE_NAME = 'quotes'
 

@@ -1,23 +1,20 @@
 {
   "name": "ta-tools-ui",
   "description": "Tech analysis tools",
-  "main": "",
   "authors": [
     "dean.high <james.dean.high@gmail.com>"
   ],
-  "license": "MIT",
-  "homepage": "",
   "private": true,
-  "dependencies":{
+  "dependencies": {
     "bootstrap": "3.3.6",
     "datatables.net": "1.10.12",
-    "datatables.net-bs": "1.10.12"
+    "datatables.net-bs": "1.10.12",
+    "react": "^15.3.2",
+    "babel": "^5.8.38",
+    "remarkable": "^1.7.0",
+    "ag-grid": "^6.0.1",
+    "angular-resource": "^1.5.8",
+    "angular": "^1.5.8"
   },
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ]
+  "ignore": []
 }

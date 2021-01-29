@@ -4,9 +4,10 @@ import os
 from logging import warning, info
 
 import pandas as pd
+
 from conf import get_symbols
-from indicators import get_all_indicators_df
 from sources import MongoTickerSource
+from ta.indicators import get_all_indicators_df
 
 
 def export_dataframe(df, output_filename, sheetname):
