@@ -20,9 +20,9 @@ def get_collection(db, name, drop_col=False):
     return col
 
 
-def dataframe_to_mongo(df, symbol):
+def dataframe_to_mongo(df, symbol, overwrite=False):
     with MongoClient(*MONGO) as mc:
         db = mc.get_database('quotes')
-        col = get_collection(db, symbol)
+        col = get_collection(db, symbol, overwrite)
         insert(col, df)
 

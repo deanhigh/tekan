@@ -40,11 +40,11 @@ symbols:
   - IJK
   - IJY
   - VIX
-  - OVX
-  - VXN
+  - ^OVX
+  - ^VXN
   - RVX
-  - TYVIX
-  - GVZ
+  - ^TYVIX
+  - ^GVZ
   - GLD
   - SLV
   - JJC
@@ -56,8 +56,7 @@ symbols:
   - FXA
   - EWA
   - FXCH
-  - $CZH
-  - HKD
+  - ^CZH
   - EWH
   - ICN
   - IFN

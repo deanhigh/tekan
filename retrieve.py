@@ -1,34 +1,34 @@
 'http://query.yahooapis.com/v1/public/yql'
 import argparse
+import logging
+from logging import info, exception
 
-import pandas_datareader.data as web
-import yaml
-from conf import TS_RANGE
+from pandas_datareader import data
+from conf import TS_RANGE, get_symbols
 from mongo_tools import dataframe_to_mongo
-
-
-def get_symbols(symbol_file='symbols.yml'):
-    with open(symbol_file) as f:
-        yml = yaml.load(f)
-        return yml['symbols']
+from pandas_datareader._utils import RemoteDataError
 
 
 def fetch_symbol_data(symbol):
-    df = web.DataReader(symbol, 'yahoo', *TS_RANGE)
-    dataframe_to_mongo(df, symbol)
+    info("Fetching underlying data for %s", symbol)
+    df = data.DataReader(symbol, 'yahoo', *TS_RANGE)
+    dataframe_to_mongo(df, symbol, True)
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     argsp = argparse.ArgumentParser('Retrieve data from sources and insert into mongo')
     argsp.add_argument('-s', action='store', dest='symbol', help='Symbol to retrieve')
-    argsp.add_argument('-f', action='store_true', dest='symbols_file', default=False, help='Retrieve in symbols file')
+    argsp.add_argument('-f', action='store', dest='symbols_file', default=False, help='Retrieve in symbols file')
     args = argsp.parse_args()
 
     if args.symbols_file:
         for s in get_symbols(args.symbols_file):
-            fetch_symbol_data(s)
+            try:
+                fetch_symbol_data(s)
+            except RemoteDataError as e:
+                exception("Error fetching symbol %s", s)
     elif args.symbol:
         fetch_symbol_data(args.symbol)
     else:
         argsp.print_help()
-
