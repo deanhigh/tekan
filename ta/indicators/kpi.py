@@ -9,34 +9,35 @@ from ta.indicators.smoothing import Smoothing
 
 
 class Indicator(object):
-    data_set = None
 
-    @classmethod
-    def create_from_dataset(cls, data_set, *args, **kwargs):
-        m = cls(*args, **kwargs)
-        m.data_set = data_set
-        return m
+    def __init__(self, data_set):
+        self.data_set = data_set
 
-    def calc(self, *args, **kwargs):
+    def calc(self):
         raise NotImplementedError('{} has not implemented calc method'.format(self))
 
 
-class SMA(Indicator):
+class MovingAverage(Indicator):
+
+    def __init__(self, data_set, period, field):
+        super(MovingAverage, self).__init__(data_set)
+        self.period = period
+        self.field = field
+
+
+class SMA(MovingAverage):
     """ Simple moving average on a field of choice"""
 
-    def calc(self, period=20, field=ADJ_CLOSE):
-        self.data_set.data_frame['MA{}'.format(period)] = talib.SMA(self.data_set.data_frame[ADJ_CLOSE].values, period)
+    def calc(self):
+        self.data_set.data_frame['MA{}'.format(self.period)] = talib.SMA(self.data_set.data_frame[self.field].values, self.period)
         return self.data_set
 
-    def __str__(self):
-        return 'MA'
 
-
-class EMA(Indicator):
+class EMA(MovingAverage):
     """ Exponentially weighted moving average """
 
-    def calc(self, period=20, field=ADJ_CLOSE):
-        self.data_set.data_frame['EMA{}'.format(period)] = talib.EMA(self.data_set.data_frame[ADJ_CLOSE].values, period)
+    def calc(self):
+        self.data_set.data_frame['EMA{}'.format(self.period)] = talib.EMA(self.data_set.data_frame[ADJ_CLOSE].values, self.period)
         return self.data_set
 
 

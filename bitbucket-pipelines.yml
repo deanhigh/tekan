@@ -1,16 +1,9 @@
-image: python:3.5.1
+image: deanhigh/techan:latest
 
 pipelines:
   default:
     - step:
         script:
-          - tar xzf ta-lib-0.4.0-src.tar.gz
-          - cd ta-lib
-          - ./configure --prefix=/usr
-          - make
-          - make install
-          - pip install -U tox
-          - pip --version
-          - tox --version
-          - cd ..
-          - tox
+          - pip install -U coverage pylint
+          - pylint ta
+          - nosetests --with-coverage --cover-package=ta
