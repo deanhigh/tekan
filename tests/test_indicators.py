@@ -1,14 +1,15 @@
 import unittest
 
 import numpy as np
-
+import os
 from ta.data_management.file_ds import FileSource
 from ta.indicators.kpi import SMA
 
+print()
 
 class TestIndividualIndicatorsWrapped(unittest.TestCase):
     def setUp(self):
-        self.ds = FileSource("TEST", "./test_data_frame.csv")
+        self.ds = FileSource("TEST", os.path.join(os.path.dirname(__file__), "./test_data_frame.csv"))
 
     def test_sma(self):
         result = SMA.create_from_dataset(self.ds).calc()

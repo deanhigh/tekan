@@ -2,6 +2,7 @@ import unittest
 
 import numpy as np
 import talib
+import os
 from pandas import Series
 
 from ta.data_management.file_ds import FileSource
@@ -20,7 +21,7 @@ class TestTALibFunctions(unittest.TestCase):
         self.assertListEqual([np.isnan(x) for x in output[10:]], [False] * 5)
 
     def test_load_series(self):
-        ds = FileSource("TEST", "./test_data_frame.csv")
+        ds = FileSource("TEST", os.path.join(os.path.dirname(__file__), "./test_data_frame.csv"))
         df = ds.data_frame
         df['SMA10'] = talib.SMA(ds.data_frame[ADJ_CLOSE].values, 10)
         print(ds.data_frame['SMA10'])
