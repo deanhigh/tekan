@@ -1,88 +1,8 @@
 import math
 from functools import partial, reduce
 
-import matplotlib.pyplot as plt
-import pandas as pd
-from conf import MONGO
-from mdl import DATE, ADJ_CLOSE, HIGH, LOW, CLOSE, VOLUME, OPEN
-from pymongo import MongoClient
-
-MONGO_DATABASE_NAME = 'quotes'
-
-
-class TickerSource(object):
-    def underlying_field_df(self, field=ADJ_CLOSE):
-        pass
-
-    def underlying_df(self):
-        pass
-
-
-class MongoTickerSource(TickerSource):
-    def __init__(self, ticker):
-        super(MongoTickerSource, self).__init__()
-        self.ticker = ticker
-        self.data = None
-
-    def __enter__(self):
-        self.mc = MongoClient(*MONGO)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.mc.close()
-
-    def exists(self):
-        return self.ticker in self.mc.get_database(MONGO_DATABASE_NAME).collection_names()
-
-    def all_data(self, col):
-        if not self.data:
-            self.data = [x for x in self.mc.get_database(MONGO_DATABASE_NAME).get_collection(col).find()]
-            self.index = pd.DatetimeIndex([i[DATE] for i in self.data])
-        return self.data
-
-    def underlying_field_df(self, field=ADJ_CLOSE):
-        col = self.all_data(self.ticker)
-        return pd.DataFrame(
-            data={field: list(map(lambda x: x[field], col))},
-            index=self.index,
-            dtype=float).sort_index()
-
-    def underlying_df(self, fields=(HIGH, LOW, OPEN, CLOSE, ADJ_CLOSE, VOLUME)):
-        col = self.all_data(self.ticker)
-        data = {x: [] for x in fields}
-        for i in col:
-            for f in fields:
-                data[f].append(i[f])
-
-        return pd.DataFrame(
-            data=data,
-            index=self.index,
-            dtype=float).sort_index()
-
-
-class Smoothing(object):
-    """ class containing some smoothing functions used in some of the indicator """
-
-    def __init__(self):
-        self.previous = None
-
-    @classmethod
-    def smoothing(cls, period):
-        return partial(cls()._smoothing, period)
-
-    def _smoothing(self, period, values):
-        smoothed = (self.previous * (period - 1) + values[-1]) / period if self.previous else sum(values) / period
-        self.previous = smoothed
-        return self.previous
-
-    @classmethod
-    def first_smoothing(cls, period):
-        return partial(cls()._first_smoothing, period)
-
-    def _first_smoothing(self, period, vals):
-        smoothed = self.previous - (self.previous / period) + vals[-1] if self.previous else sum(vals)
-        self.previous = smoothed
-        return smoothed
+from indicators.smoothing import Smoothing
+from mdl import ADJ_CLOSE, HIGH, LOW, CLOSE
 
 
 class Indicator(object):
@@ -96,6 +16,7 @@ class Indicator(object):
 
     def calc(self, *args, **kwargs):
         raise NotImplementedError('{} has not implemented calc method'.format(self))
+
 
 
 class SMA(Indicator):
@@ -273,12 +194,3 @@ class CCI(Indicator):
                                   args=(period, constant)).rename(columns={'TP': 'CCI{}/{}'.format(period, constant)})
 
 
-def get_all_indicators_df(ticker_source, ind=(STDDEV, SMA, EWMA, ATR, ATRP, ADX, CCI)):
-    return reduce(lambda df, ndf: df.join(ndf.create(ticker_source).calc()), ind, ticker_source.underlying_df())
-
-
-if __name__ == '__main__':
-    with MongoTickerSource('^GSPC') as t:
-        plt.style.use('dark_background')
-        t.underlying_field_df(ADJ_CLOSE).join(EWMA.create(t).calc()).join(EWMA.create(t).calc(50)).join(EWMA.create(t).calc(100)).plot()
-        plt.show()

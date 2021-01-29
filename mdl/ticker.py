@@ -1,4 +1,4 @@
-from datasources.yahoo.yfds import TickerDataRetriever
+from connectors.yahoo.yfds import TickerDataRetriever
 
 
 class Ticker(object):
