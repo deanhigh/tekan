@@ -32,8 +32,8 @@ class SymbolsSync(Resource):
         return "Synching Started"
 
 class TimeSeries(Resource):
-    def get(self):
-        return get_time_series('SSO').to_csv()
+    def get(self, ticker=None):
+        return get_time_series(ticker).to_csv()
 
 
 api.add_resource(SymbolsAdmin, '/api/admin/symbols', '/api/admin/symbols/<string:ticker>')
