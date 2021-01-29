@@ -1,0 +1,9 @@
+FROM python:3.5.2
+
+ADD ta-lib-0.4.0-src.tar.gz /tmp
+ADD requirements.txt /tmp
+
+RUN cd /tmp/ta-lib && ./configure --prefix=/usr && make && make install
+RUN pip install -r /tmp/requirements.txt
+
+RUN mkdir /opt/techan
