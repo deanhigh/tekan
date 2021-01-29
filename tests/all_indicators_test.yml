@@ -1,4 +1,5 @@
 indicators:
+  # Moving Average indicators
   - id: SYM.MA20
     class: ta.indicators.ma.SMA
     period: 20
@@ -11,6 +12,12 @@ indicators:
     class: ta.indicators.ma.STDDEV
     period: 20
     input_data_id: SYM.ADJ_CLOSE
+  # True Range indicators
+  - id: SYM.TR
+    class: ta.indicators.tr.TR
+    close_data_id: SYM.ADJ_CLOSE
+    high_data_id: SYM.HIGH
+    low_data_id: SYM.LOW
 sources:
   - id: SYM.LOADER
     class: ta.data_management.file_ds.FileSource
@@ -18,3 +25,5 @@ sources:
     fields:
       'Adj Close': SYM.ADJ_CLOSE
       'Open': SYM.OPEN
+      'High': SYM.HIGH
+      'Low': SYM.LOW

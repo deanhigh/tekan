@@ -14,6 +14,7 @@ basic_test_data = [
     {'ind_name': 'SYM.MA20', 'ind_cls': SMA, 'test_points': {'2016-12-28': 2270.1749999999997}},
     {'ind_name': 'SYM.EMA20', 'ind_cls': EMA, 'test_points': {'2016-12-28': 2286.7962876973415}},
     {'ind_name': 'SYM.STDDEV20', 'ind_cls': STDDEV, 'test_points': {'2016-12-28': 274.28670333248476}},
+    {'ind_name': 'SYM.TR', 'ind_cls': TR, 'test_points': {'2016-12-28': 2580.0899999999997}},
 ]
 
 
