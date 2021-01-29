@@ -35,7 +35,7 @@ def get_symbols():
         db = mc.get_database('admin')
         col = db.get_collection('symbols')
         col.ensure_index('ticker')
-        return [x for x in col.find()]
+        return [Symbol(x['ticker']) for x in col.find()]
 
 
 def add_symbol(symbol):

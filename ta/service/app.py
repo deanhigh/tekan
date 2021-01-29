@@ -1,7 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 
+from ta.data_management.data_sync import fetch_all_symbols_data
 from ta.db.mongo_tools import get_symbols, add_symbol, delete_symbol
+
+from multiprocessing import Process
 
 app = Flask(__name__)
 api = Api(app)
@@ -9,7 +12,7 @@ api = Api(app)
 
 class SymbolsAdmin(Resource):
     def get(self):
-        return jsonify([{'ticker': x['ticker']} for x in get_symbols()])
+        return jsonify([{'ticker': x.ticker} for x in get_symbols()])
 
     def post(self):
         content = request.get_json(silent=True)
@@ -22,8 +25,8 @@ class SymbolsAdmin(Resource):
 
 class SymbolsSync(Resource):
     def post(self):
-        print("Sync")
-        return "Synching"
+        #Process(target=fetch_all_symbols_data).start()
+        return "Synching Started"
 
 api.add_resource(SymbolsAdmin, '/api/admin/symbols', '/api/admin/symbols/<string:ticker>')
 api.add_resource(SymbolsSync, '/api/admin/symbols-sync', '/api/admin/symbols-sync/<string:ticker>')
