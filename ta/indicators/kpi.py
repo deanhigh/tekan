@@ -10,17 +10,17 @@ from ta.indicators.smoothing import Smoothing
 
 class Indicator(object):
 
-    def __init__(self, data_set):
-        self.data_set = data_set
+    def __init__(self, input_data_set):
+        self.input_data_set = input_data_set
 
     def calc(self):
         raise NotImplementedError('{} has not implemented calc method'.format(self))
 
 
-class MovingAverage(Indicator):
 
-    def __init__(self, data_set, period, field):
-        super(MovingAverage, self).__init__(data_set)
+class MovingAverage(Indicator):
+    def __init__(self, input_data_set, period, field):
+        super(MovingAverage, self).__init__(input_data_set)
         self.period = period
         self.field = field
 
@@ -29,23 +29,23 @@ class SMA(MovingAverage):
     """ Simple moving average on a field of choice"""
 
     def calc(self):
-        self.data_set.data_frame['MA{}'.format(self.period)] = talib.SMA(self.data_set.data_frame[self.field].values, self.period)
-        return self.data_set
+        self.input_data_set.data_frame['MA{}'.format(self.period)] = talib.SMA(self.input_data_set.data_frame[self.field].values, self.period)
+        return self.input_data_set
 
 
 class EMA(MovingAverage):
     """ Exponentially weighted moving average """
 
     def calc(self):
-        self.data_set.data_frame['EMA{}'.format(self.period)] = talib.EMA(self.data_set.data_frame[ADJ_CLOSE].values, self.period)
-        return self.data_set
+        self.input_data_set.data_frame['EMA{}'.format(self.period)] = talib.EMA(self.input_data_set.data_frame[ADJ_CLOSE].values, self.period)
+        return self.input_data_set
 
 
 class STDDEV(Indicator):
     """Standard deviation of a field"""
 
     def calc(self, period=20, field=ADJ_CLOSE):
-        return self.data_set.underlying_field_df(field).rolling(period).std().rename(
+        return self.input_data_set.underlying_field_df(field).rolling(period).std().rename(
             columns={field: 'STDDEV{}'.format(period)})
 
 
@@ -61,10 +61,10 @@ class TR(Indicator):
         return tr
 
     def calc(self):
-        data = self.data_set.underlying_field_df(HIGH). \
-            join(self.data_set.underlying_field_df(LOW)). \
-            join(self.data_set.underlying_field_df(CLOSE)). \
-            join(self.data_set.underlying_field_df(CLOSE).shift(), rsuffix='_prev')
+        data = self.input_data_set.underlying_field_df(HIGH). \
+            join(self.input_data_set.underlying_field_df(LOW)). \
+            join(self.input_data_set.underlying_field_df(CLOSE)). \
+            join(self.input_data_set.underlying_field_df(CLOSE).shift(), rsuffix='_prev')
         tr = data.apply(self._tr, axis=1).to_frame(name='TR')
         return tr
 
@@ -73,7 +73,7 @@ class ATR(Indicator):
     """ Average True Range """
 
     def calc(self, period=14):
-        atr = TR.create(self.data_set).calc().rolling(period).apply(Smoothing.smoothing(period)).rename(
+        atr = TR.create(self.input_data_set).calc().rolling(period).apply(Smoothing.smoothing(period)).rename(
             columns={'TR': 'ATR{}'.format(period)})
         return atr
 
@@ -82,7 +82,7 @@ class ATRP(Indicator):
     """Average true range as percentage of close"""
 
     def calc(self, period=14):
-        data = ATR.create(self.data_set).calc(period).join(self.data_set.underlying_field_df(CLOSE))
+        data = ATR.create(self.input_data_set).calc(period).join(self.input_data_set.underlying_field_df(CLOSE))
         return data.apply(lambda v: (v['ATR{}'.format(period)] / v[CLOSE]) * 100, axis=1).to_frame(
             'ATRP{}'.format(period))
 
@@ -109,10 +109,10 @@ class DM(Indicator):
             return None
 
     def _combine_data(self):
-        return self.data_set.underlying_field_df(HIGH). \
-            join(self.data_set.underlying_field_df(LOW)). \
-            join(self.data_set.underlying_field_df(HIGH).shift(), rsuffix='_prev'). \
-            join(self.data_set.underlying_field_df(LOW).shift(), rsuffix='_prev')
+        return self.input_data_set.underlying_field_df(HIGH). \
+            join(self.input_data_set.underlying_field_df(LOW)). \
+            join(self.input_data_set.underlying_field_df(HIGH).shift(), rsuffix='_prev'). \
+            join(self.input_data_set.underlying_field_df(LOW).shift(), rsuffix='_prev')
 
     def calc(self):
         data = self._combine_data()
@@ -126,8 +126,8 @@ class SmootherDM(Indicator):
         self.previous = None
 
     def calc(self, period=14):
-        dm = DM.create(self.data_set).calc()
-        smtr = TR.create(self.data_set).calc().rolling(period).apply(Smoothing.first_smoothing(period)).rename(
+        dm = DM.create(self.input_data_set).calc()
+        smtr = TR.create(self.input_data_set).calc().rolling(period).apply(Smoothing.first_smoothing(period)).rename(
             columns={'TR': 'TR{}'.format(period)})
         pdm = dm['+DM'].rolling(period).apply(Smoothing.first_smoothing(period)).to_frame('+DM{}'.format(period))
         ndm = dm['-DM'].rolling(period).apply(Smoothing.first_smoothing(period)).to_frame('-DM{}'.format(period))
@@ -144,7 +144,7 @@ class DI(Indicator):
         return 100 * (v['-DM{}'.format(period)] / v['TR{}'.format(period)])
 
     def calc(self, period=14):
-        sdm = SmootherDM.create(self.data_set).calc(period)
+        sdm = SmootherDM.create(self.input_data_set).calc(period)
         return sdm.apply(partial(self._dip, period), axis=1).to_frame(name='+DI{}'.format(period)).join(
             sdm.apply(partial(self._din, period), axis=1).to_frame(name='-DI{}'.format(period)))
 
@@ -162,7 +162,7 @@ class ADX(Indicator):
         return 100 * (v['DIFF'] / v['SUM'])
 
     def calc(self, period=14):
-        di = DI.create(self.data_set).calc(period)
+        di = DI.create(self.input_data_set).calc(period)
         prep = di.apply(partial(self._didiff, period), axis=1).to_frame(name='DIFF').join(
             di.apply(partial(self._disum, period), axis=1).to_frame(name='SUM'))
         dx = prep.apply(self._dx, axis=1).to_frame(name='DX')
@@ -174,9 +174,9 @@ class TypicalPrice(Indicator):
     """ The typical price is the average of High, Low & Close prices"""
 
     def _combine_data(self):
-        return self.data_set.underlying_field_df(HIGH). \
-            join(self.data_set.underlying_field_df(LOW)). \
-            join(self.data_set.underlying_field_df(CLOSE))
+        return self.input_data_set.underlying_field_df(HIGH). \
+            join(self.input_data_set.underlying_field_df(LOW)). \
+            join(self.input_data_set.underlying_field_df(CLOSE))
 
     def calc(self):
         in_data = self._combine_data()
@@ -195,7 +195,7 @@ class CCI(Indicator):
         return cci
 
     def calc(self, period=20, constant=0.015):
-        return TypicalPrice.create(self.data_set).calc(). \
+        return TypicalPrice.create(self.input_data_set).calc(). \
             rolling(period).apply(self._cci,
                                   args=(period, constant)).rename(columns={'TP': 'CCI{}/{}'.format(period, constant)})
 
@@ -208,7 +208,7 @@ class MarketVolatilityType(Indicator):
         return 0 if val < v[1] + d3 else 1 if val < v[2] - d3 else 2
 
     def calc(self, period=20):
-        df = ATR.create(self.data_set).calc(period=period)
+        df = ATR.create(self.input_data_set).calc(period=period)
         df_minmax = df.rolling(period).agg([np.min, np.max])
         df_mvt = df.join(df_minmax).apply(self._run, axis=1).to_frame(name='MVT')
         return df.join(df_minmax.join(df_mvt))

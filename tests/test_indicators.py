@@ -18,7 +18,7 @@ class TestIndicatorsHappyPath(unittest.TestCase):
 
     def assert_indicator_structure(self, indicator, result):
         self.assertIsInstance(result, DataSet)
-        self.assertEqual(result, indicator.data_set)
+        self.assertEqual(result, indicator.input_data_set)
 
     def test_sma(self):
         sma = SMA(self.ds, period=20, field=ADJ_CLOSE)
