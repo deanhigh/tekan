@@ -8,9 +8,14 @@ angular.module('symbolsAdmin').factory('Symbol',
         });
     });
 
+angular.module('symbolsAdmin').factory('SymbolSync',
+    function ($resource) {
+        return $resource('/api/admin/symbols-sync');
+    });
+
 angular.module('symbolsAdmin').component('symbolsAdmin', {
     templateUrl: 'app/symbols-admin/symbols-admin.template.html',
-    controller: function SymbolsListController($scope, Symbol) {
+    controller: function SymbolsListController($scope, Symbol, SymbolSync) {
         this.symbols = Symbol.query(function (data) {
             $scope.symbols = data;
         });
@@ -30,12 +35,18 @@ angular.module('symbolsAdmin').component('symbolsAdmin', {
         };
 
         this.deleteSelected = function (ticker) {
-            console.log(ticker);
             $scope.symbol = new Symbol();
             $scope.symbol.ticker = ticker;
             Symbol.delete($scope.symbol, function (response) {
                 $scope.symbols = response
             });
-        }
+        };
+
+        this.syncAll = function() {
+            // var service = $resource('/api/admin/symbols-sync');
+            // service.post();
+            $scope.sync = SymbolSync();
+            SymbolSync.save($scope.sync);
+        };
     }
 });

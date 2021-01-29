@@ -11,6 +11,17 @@
             </div>
         </form>
     </div>
+    <div class="col-lg-2">
+        <form id="syncAll" action="#" ng-submit="$ctrl.syncAll()">
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <input type="Submit" value="Sync All" class="btn btn-default" type="button">
+                    Sync All
+                    </input>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <table class="table table-condensed table-hover">
@@ -23,7 +34,7 @@
     <tbody>
     <tr ng-repeat="symbol in symbols">
         <td>{{symbol.ticker}}</td>
-        <td>1900-01-01</td>
+        <td>{{symbol.start_date}}</td>
         <td><button class="btn btn-default" ng-click="$ctrl.deleteSelected(symbol.ticker)">Delete</button></td>
     </tr>
     </tbody>

@@ -20,7 +20,13 @@ class SymbolsAdmin(Resource):
         delete_symbol(ticker)
         return self.get()
 
+class SymbolsSync(Resource):
+    def post(self):
+        print("Sync")
+        return "Synching"
+
 api.add_resource(SymbolsAdmin, '/api/admin/symbols', '/api/admin/symbols/<string:ticker>')
+api.add_resource(SymbolsSync, '/api/admin/symbols-sync', '/api/admin/symbols-sync/<string:ticker>')
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True, use_reloader=False)
