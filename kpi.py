@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from conf import MONGO
 from mdl import DATE, ADJ_CLOSE, HIGH, LOW, CLOSE
+from numpy.core.numeric import ndarray
 from pymongo import MongoClient
 
 MONGO_DATABASE_NAME = 'quotes'
@@ -60,21 +61,32 @@ class STDDEV(Measure):
 
 
 class TR(Measure):
-    #TODO : BUusy with this
-    def _func(self, v):
-        x = v[HIGH] - v[LOW]
-        print(x)
-        return v
+    def _tr(self, vals):
+        prev_close = vals[CLOSE + '_prev']
+        m1 = (vals[HIGH] - vals[LOW])
+        m2 = abs(vals[HIGH] - prev_close) if prev_close else -1
+        m3 = abs(vals[LOW] - prev_close) if prev_close else -1
+        tr = max(m1, m2, m3)
+        return tr
 
     def tr(self):
-        return self.ticker_source.ticker_df(HIGH).join(self.ticker_source.ticker_df(LOW)).join(
-            self.ticker_source.ticker_df(CLOSE)).rolling(2).apply(self._func)
+        data = self.ticker_source.ticker_df(HIGH). \
+            join(self.ticker_source.ticker_df(LOW)). \
+            join(self.ticker_source.ticker_df(CLOSE)). \
+            join(self.ticker_source.ticker_df(CLOSE).shift(), rsuffix='_prev')
+        return data.apply(self._tr, axis=1)
+
+
+class ATR(TR):
+    def atr(self, period=14):
+        return self.tr().rolling(period).mean()
+
 
 def plot_samples():
     with MongoTickerSource('ADBE') as ts:
-        TR.create(ts).tr().plot()
-        # ax = ts.ticker_df().plot()
+        ax = ts.ticker_df().plot()
         # ax = MA.create(ts).ma(50).plot(ax=ax)
+        ax = ATR.create(ts).atr().plot(ax=ax)
         # ax = STDDEV.create(ts).std(10).plot(ax=ax)
         #
         plt.show()
