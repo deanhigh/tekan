@@ -14,10 +14,6 @@ class DataSet(object):
     def __set_data_frame(self, df):
         self.__data_frame = df
 
-    def get_series(self, series):
-        # self.data_frame = 0
-        pass
-
     def __len__(self):
         return self.__get_data_frame().size
 
@@ -31,6 +27,16 @@ class DataSource(DataSet):
     def save(self):
         pass
 
+
+class Series(object):
+    def __init__(self, data_set, column):
+        self.data_set = data_set
+        self.column = column
+
+    def __get_data(self):
+        return self.data_set.data_frame[self.column]
+
+    data = property(__get_data)
 
 class Predicate(object):
 
