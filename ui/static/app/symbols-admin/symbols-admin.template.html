@@ -1,20 +1,20 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-2">
-            <form id="addSymbolForm" action="#" ng-submit="$ctrl.addSymbol()">
+            <form id="addSymbolForm" action="#">
                 <div class="input-group">
                     <input type="text" ng-model="form.ticker" class="form-control">
                     <div class="input-group-btn">
-                        <input type="Submit" value="Add" class="btn btn-default">
+                        <input type="button" value="Add" ng-click="$ctrl.addSymbol(form.ticker)" class="btn btn-default">
                     </div>
                 </div>
             </form>
         </div>
         <div class="col-lg-2">
-            <form id="syncAll" action="#" ng-submit="$ctrl.syncAll()">
+            <form id="syncAll" action="#">
                 <div class="input-group">
                     <div class="input-group-btn">
-                        <input type="Submit" value="Sync All" class="btn btn-default">
+                        <input type="button" value="Sync All" ng-click="$ctrl.syncAll()" class="btn btn-default">
                     </div>
                 </div>
             </form>

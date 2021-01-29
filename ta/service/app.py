@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from mongoengine import connect
 
-from ta.db import Workflow
+from ta.db import Workflow, Symbol
 from ta.db.mongo_tools import get_symbols, delete_symbol, get_time_series, create_symbol, get_workflows, create_workflow, \
     delete_workflow
 
@@ -20,7 +20,7 @@ class SymbolsAdmin(Resource):
         return jsonify([{'ticker': x.ticker} for x in get_symbols()])
 
     def post(self):
-        content = request.get_json(silent=True)
+        content = Symbol.create(request.get_json()['ticker'])
         create_symbol(content)
         return self.get()
 

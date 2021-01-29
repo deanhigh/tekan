@@ -2,7 +2,7 @@ import math
 from functools import partial, reduce
 
 import numpy as np
-from mdl import ADJ_CLOSE, HIGH, LOW, CLOSE
+from ta.db import ADJ_CLOSE, HIGH, LOW, CLOSE
 
 from ta.indicators.smoothing import Smoothing
 
