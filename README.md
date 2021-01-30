@@ -2,9 +2,11 @@
 
 Technical analysis scratch area
 
+> The toolkit probably doesn't work anymore since Yahoo APIs are no longer a thing (or have changed)
+
 ## Getting started
 
-Installing pandas you need to install python3-dev libraries since pandas need to be compiled. 
+Installing pandas you need to install python3-dev libraries since pandas need to be compiled.
 
 `sudo apt-get install python3-dev`
 
@@ -12,7 +14,7 @@ Installing pandas you need to install python3-dev libraries since pandas need to
 
 In the root of this project, run `docker-compose up -d`
 
-Mongoclient runs on http://localhost:3000. When asked to login set the hostname as `mongo`
+Mongoclient runs on `http://localhost:3000`. When asked to login set the hostname as `mongo`
 
 ## Tools & Examples
 
