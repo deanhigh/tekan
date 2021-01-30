@@ -1,16 +1,23 @@
-#### Getting started
+# TekAn
+
+Technical analysis scratch area
+
+## Getting started
+
 Installing pandas you need to install python3-dev libraries since pandas need to be compiled. 
 
 `sudo apt-get install python3-dev`
 
-#### Mongodb
+## MongoDB
+
 In the root of this project, run `docker-compose up -d`
 
 Mongoclient runs on http://localhost:3000. When asked to login set the hostname as `mongo`
 
-#### Tools & Examples
+## Tools & Examples
 
-##### Data sourcing
+### Data sourcing
+
 To get some time series data from yahoo, all you need is a symbol and a place to put it. Currently you can save to a csv file
 or to mongo.
 
@@ -22,7 +29,7 @@ For other options run
 
 `python ta.retrieve_yahoo -h`
 
-##### Workflow Examples
+### Workflow Examples
 
 Run simple workflow using mongo source.
 

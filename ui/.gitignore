@@ -1,6 +1,0 @@
-dist
-archive
-node_modules
-**/vendor/
-**/libs/
-npm-debug.log
