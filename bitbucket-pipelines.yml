@@ -1,8 +1,0 @@
-image: deanhigh/techan:latest
-
-pipelines:
-  default:
-    - step:
-        script:
-          - pip install -U coverage pylint
-          - nosetests --with-coverage --cover-package=ta
